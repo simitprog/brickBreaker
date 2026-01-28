@@ -23,16 +23,13 @@ public class MyKeyboardAdapter implements KeyListener{
         int step = 20; 
 
         if(e.getKeyChar()=='w'){
-            pannelloSuCuiLavorare.moveSquare(0, -step);
+            
         }
          if(e.getKeyChar()=='a'){
-            pannelloSuCuiLavorare.moveSquare(-step, 0);
         }
          if(e.getKeyChar()=='s'){
-            pannelloSuCuiLavorare.moveSquare(0, step);
         }
          if(e.getKeyChar()=='d'){
-            pannelloSuCuiLavorare.moveSquare(step, 0);
         }
 
 
