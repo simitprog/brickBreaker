@@ -4,11 +4,43 @@ public class BloccoLogico {
     public boolean distrutto;
 
 
-    public BloccoLogico(Punto posizione, double altezza, double larghezza, boolean distrutto) {
+    public Punto getPosizione() {
+        return posizione;
+    }
+
+    public void setPosizione(Punto posizione) {
+        this.posizione = posizione;
+    }
+
+    public double getAltezza() {
+        return altezza;
+    }
+
+    public void setAltezza(double altezza) {
+        this.altezza = altezza;
+    }
+
+    public double getLarghezza() {
+        return larghezza;
+    }
+
+    public void setLarghezza(double larghezza) {
+        this.larghezza = larghezza;
+    }
+
+    public boolean isDistrutto() {
+        return distrutto;
+    }
+
+    public void setDistrutto(boolean distrutto) {
+        this.distrutto = distrutto;
+    }
+
+    public BloccoLogico(Punto posizione, double altezza, double larghezza) {
         this.posizione = posizione;
         this.altezza = altezza;
         this.larghezza = larghezza;
-        this.distrutto = distrutto;
+        this.distrutto=false;
     }
 
     public boolean collisione(PallinaLogica palla)

@@ -1,6 +1,8 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
+import java.util.List;
 
 class MyPanel extends JPanel {
 
@@ -9,10 +11,39 @@ class MyPanel extends JPanel {
     public int squareW = 20;
     public int squareH = 20;
     public Color square_color = Color.RED;
+    private List<BloccoGrafico> listaBlocchi = new ArrayList<>();
+    private  int larghezzaPannello=1000;
+    private int altezzaPannello=700;
 
+    private Image sfondo;
 
     public MyPanel() {
+
+        int nRighe=6;
+        int nColonne=7;
+        int spazioTraIBlocchi=11;
         setBorder(BorderFactory.createLineBorder(Color.black));
+
+        double larghezzaBlocco= 130;
+        double altezzaBlocco=25;
+        int margineVerticaleInizialeDallaCimaDelPannello = 10;
+
+
+        for (int i = 0; i < nRighe; i++) {
+            for (int j = 0; j < nColonne; j++) {
+                double x= spazioTraIBlocchi + j *(larghezzaBlocco +spazioTraIBlocchi);
+                double y = margineVerticaleInizialeDallaCimaDelPannello + i *(altezzaBlocco +spazioTraIBlocchi);
+                Punto punto = new Punto(x, y);
+                BloccoLogico logico = new BloccoLogico(punto, altezzaBlocco, larghezzaBlocco);
+                listaBlocchi.add(new BloccoGrafico(logico));
+            }
+        }
+      
+        sfondo= new ImageIcon("resources/secondosfondoprovvisorio.jpg").getImage();
+        
+
+
+
 
         // Aggiungo mouse listener
         MyMouseAdapter mouse = new MyMouseAdapter(this);
@@ -25,37 +56,46 @@ class MyPanel extends JPanel {
         addKeyListener(keyboard);
     }
 
+
+
+
+
     @Override
     public Dimension getPreferredSize() {
-        return new Dimension(250, 200);
+        return new Dimension(larghezzaPannello, altezzaPannello);
     }
+
+
+
+
+
+
 
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        g.drawString("This is my custom Panel!", 10, 20);
 
-        g.setColor(square_color);
-        g.fillRect(squareX, squareY, squareW, squareH);
-        
-        g.setColor(Color.BLACK);
-        g.drawRect(squareX, squareY, squareW, squareH);
+        if(sfondo!=null){   
+            g.drawImage(sfondo,0,0,larghezzaPannello,altezzaPannello,this);
+        }else{
+            super.paintComponent(g);
+        }
 
+
+
+
+        for(BloccoGrafico b : listaBlocchi){    
+            b.disegna(g);
+        }
         
     }
 
-    public void moveSquare(int x, int y) {
-        squareX += x;
-        squareY += y;
 
-        if (squareX < 0) squareX = 0;
-        if (squareY < 0) squareY = 0;
-        if (squareX + squareW > getWidth()) squareX = getWidth() - squareW;
-        if (squareY + squareH > getHeight()) squareY = getHeight() - squareH;
 
-        repaint();
-    }
+
+
+
 
 
    
