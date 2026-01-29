@@ -5,93 +5,158 @@ import java.util.ArrayList;
 import java.util.List;
 
 class MyPanel extends JPanel {
-    private  int larghezzaPannello=1000;
-    private int altezzaPannello=700;
+    private int larghezzaPannello = 1000;
+    private int altezzaPannello = 700;
 
-    private int larghezzaPiattaforma=140;
-    private int altezzaPiattaforma=20;
+    private int larghezzaPiattaforma = 140;
+    private int altezzaPiattaforma = 20;
+
+    private boolean giocoIniziato = false;
+    private boolean gameOver = false;
     
-    public giocatoreLogico gl= new giocatoreLogico((larghezzaPannello-larghezzaPiattaforma)/2, 50, larghezzaPiattaforma, altezzaPiattaforma,larghezzaPannello );
+    // Giocatore (Piattaforma)
+    public giocatoreLogico gl = new giocatoreLogico((larghezzaPannello - larghezzaPiattaforma) / 2, 630, larghezzaPiattaforma, altezzaPiattaforma, larghezzaPannello);
     public GiocatoreGrafico piattaforma = new GiocatoreGrafico(gl, Color.BLACK);
-    private List<BloccoGrafico> listaBlocchi = new ArrayList<>();
-   
+    
+    // Pallina
+    public PallinaLogica pl = new PallinaLogica(500, 600, 10, larghezzaPannello, altezzaPannello);
+    public PallinaGrafica palla = new PallinaGrafica(pl, Color.RED);
 
+    private List<BloccoGrafico> listaBlocchi = new ArrayList<>();
     private Image sfondo;
 
     public MyPanel() {
-
-        int nRighe=6;
-        int nColonne=7;
+        int nRighe = 6;
+        int nColonne = 7;
     
         setBorder(BorderFactory.createLineBorder(Color.black));
 
-        double larghezzaBlocco= 142.85;
-        double altezzaBlocco=25;
-        
+        double larghezzaBlocco = 142.85;
+        double altezzaBlocco = 25;
 
-
+        // Inizializzazione blocchi
         for (int i = 0; i < nRighe; i++) {
             for (int j = 0; j < nColonne; j++) {
-                double x=  j *larghezzaBlocco ;
-                double y =  i *altezzaBlocco ;
+                double x = j * larghezzaBlocco;
+                double y = i * altezzaBlocco;
                 Punto punto = new Punto(x, y);
                 BloccoLogico logico = new BloccoLogico(punto, altezzaBlocco, larghezzaBlocco);
                 listaBlocchi.add(new BloccoGrafico(logico));
             }
         }
       
-        sfondo= new ImageIcon("resources/Possibilesfondo.jpg").getImage();
+        sfondo = new ImageIcon("resources/Possibilesfondo.jpg").getImage();
         
-        // Aggiungo mouse listener
+        // Avvio del Thread della pallina (partirà ferma perché pl.attiva è false)
+        Thread threadPalla = new Thread(pl);
+        threadPalla.start();
+
+        // Game Loop
+        Timer gameLoop = new Timer(16, e -> {
+            updateGame();
+            repaint();
+        });
+        gameLoop.start();
+
+        // Listeners
         MyMouseAdapter mouse = new MyMouseAdapter(this);
         addMouseListener(mouse);
+        addMouseMotionListener(mouse); 
 
-        // Aggiungo key listener
         MyKeyboardAdapter keyboard = new MyKeyboardAdapter(this);
-        setFocusable(true); // permette al pannello di ricevere eventi da tastiera
+        setFocusable(true);
         requestFocusInWindow();
         addKeyListener(keyboard);
     }
 
+    private void updateGame() {
+        if (gameOver || !giocoIniziato) return; 
+
+        gl.update();
+        pl.controllaRimbalzoGiocatore(gl);
+
+        // CONTROLLO SCONFITTA
+        if (pl.getPosizione().getY() + (pl.getRaggio() * 2) > altezzaPannello) {
+            gameOver = true;
+            pl.setAttiva(false); 
+        }
+
+        // Collisioni blocchi
+        for (BloccoGrafico b : listaBlocchi) {
+            if (b.getLogico().collisione(pl)) {
+                pl.invertiY();
+            }
+        }
+    }
+
+    @Override
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+
+        // 1. Disegno Sfondo
+        if (sfondo != null) {
+            g.drawImage(sfondo, 0, 0, larghezzaPannello, altezzaPannello, this);
+        }
+
+        // 2. Disegno Entità
+        piattaforma.disegna(g);
+        palla.disegna(g);
+        for (BloccoGrafico b : listaBlocchi) {
+            b.disegna(g);
+        }
+
+        // 3. Overlay INIZIO GIOCO
+        if (!giocoIniziato && !gameOver) {
+            disegnaMessaggioCentrale(g, "PREMI INVIO PER GIOCARE", Color.WHITE);
+        }
+
+        // 4. Overlay GAME OVER
+        if (gameOver) {
+            // Sfondo scuro semitrasparente per dare enfasi al Game Over
+            g.setColor(new Color(0, 0, 0, 150));
+            g.fillRect(0, 0, larghezzaPannello, altezzaPannello);
+            disegnaMessaggioCentrale(g, "GAME OVER", Color.RED);
+        }
+    }
+
+    /**
+     * Metodo di utility per disegnare testo centrato
+     */
+    private void disegnaMessaggioCentrale(Graphics g, String testo, Color colore) {
+        g.setFont(new Font("Verdana", Font.BOLD, 40));
+        FontMetrics fm = g.getFontMetrics();
+        int x = (larghezzaPannello - fm.stringWidth(testo)) / 2;
+        int y = altezzaPannello / 2;
+
+        // Ombra
+        g.setColor(Color.BLACK);
+        g.drawString(testo, x + 3, y + 3);
+        // Testo principale
+        g.setColor(colore);
+        g.drawString(testo, x, y);
+    }
+
+    public void iniziaPartita() {
+        if (!gameOver) {
+            this.giocoIniziato = true;
+            this.pl.setAttiva(true);
+        }
+    }
 
     @Override
     public Dimension getPreferredSize() {
         return new Dimension(larghezzaPannello, altezzaPannello);
     }
 
-
-    @Override
-    public void paintComponent(Graphics g) {
-        super.paintComponent(g);
-
-
-        if(sfondo!=null){   
-            g.drawImage(sfondo,0,0,larghezzaPannello,altezzaPannello,this);
-        }else{
-            super.paintComponent(g);
-        }
-
-        piattaforma.disegna(g);
-
-
-        for(BloccoGrafico b : listaBlocchi){    
-            b.disegna(g);
-        }
-        
+    public giocatoreLogico getGiocatoreLogico() {
+        return gl;
     }
 
+    public boolean isGameOver() {
+        return gameOver;
+    }
+    public boolean isGiocoIniziato() {
+    return giocoIniziato;
+}
 
-
-
-
-
-
-
-   
-
-
-    
-
-    
-    
 }

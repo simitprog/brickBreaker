@@ -7,6 +7,21 @@ import java.awt.Graphics;
  */
 public class GiocatoreGrafico {
     private giocatoreLogico giocatore;
+    
+    public giocatoreLogico getGiocatoreLogico() {
+        return giocatore;
+    }
+
+    //costruttore con paramtetri
+    public GiocatoreGrafico(giocatoreLogico logica) {
+        this.giocatore = logica;
+        this.colore = Color.BLUE;
+    }
+
+    public void setGiocatore(giocatoreLogico giocatore) {
+        this.giocatore = giocatore;
+    }
+
     private Color colore;
 
     /**

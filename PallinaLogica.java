@@ -7,6 +7,24 @@ public class PallinaLogica implements Runnable{
     private double raggio;
     private double velX, velY;
     private double limiteX, limiteY;
+    private boolean attiva = false; // La pallina parte "ferma"
+
+    // Metodo per attivare il movimento
+    public void setAttiva(boolean attiva) {
+        this.attiva = attiva;
+    }
+
+    @Override
+    public void run() {
+        while (true) {
+            if (attiva) { // Muovi solo se attiva è true
+                muovi();
+            }
+            try {
+                Thread.sleep(7);
+            } catch (InterruptedException e) { }
+        }
+    }
 
     /**
      * @brief costruttore
@@ -26,38 +44,24 @@ public class PallinaLogica implements Runnable{
     }
 
     /**
-     * @brief la pallina si muove con i thread
-     */
-    @Override
-    public void run() {
-        while (true) {
-            muovi();
-            try {
-                Thread.sleep(60);
-            } catch (InterruptedException e) {  }
-        }
-    }
-
-    /**
      * @brief muove la pallina
      */
     public void muovi() {
         posizione.setX(posizione.getX()+velX);
         posizione.setY(posizione.getY()+velY);
+
+        controllaCollisioniMuri();
     }
 
     /**
      * @brief controlla collisioni con i muri
      */
-    private void controllaCollisioniMuri(){
-        //controllo muri per le x
-        if(posizione.getX()<=0 || posizione.getX()+raggio*2>=limiteX){
-            velX=-velX;
+    private void controllaCollisioniMuri() {
+        if (posizione.getX() <= 0 || posizione.getX() + raggio * 2 >= limiteX) {
+            velX = -velX;
         }
-
-        //controllo muri per le y
-        if(posizione.getY()<=0 || posizione.getY()+raggio*2>=limiteY){
-            velY=-velY;
+        if (posizione.getY() <= 0) {
+            velY = -velY;
         }
     }
 
@@ -93,5 +97,9 @@ public class PallinaLogica implements Runnable{
 
     public double getRaggio(){
         return this.raggio;
+    }
+
+    public void invertiY(){
+        velY=-velY;
     }
 }

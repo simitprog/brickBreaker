@@ -3,6 +3,12 @@ import java.awt.Graphics;
 
 public class BloccoGrafico {
     private BloccoLogico blocco;
+    
+    
+    public BloccoLogico getBlocco() {
+        return blocco;
+    }
+
     private Color colore;
 
 
@@ -39,6 +45,8 @@ public class BloccoGrafico {
     }
 
 
-
+    public BloccoLogico getLogico() {
+        return this.blocco; // o il nome della variabile BloccoLogico interna
+    }
 
 }

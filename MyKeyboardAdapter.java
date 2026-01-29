@@ -1,50 +1,35 @@
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseListener;
 
-import org.w3c.dom.events.MouseEvent;
+/**
+ * @class MyKeyboardAdapter
+ * @brief Gestisce l'input da tastiera per il gioco
+ */
+public class MyKeyboardAdapter extends KeyAdapter {
 
-public class MyKeyboardAdapter implements KeyListener{
+    private MyPanel pannelloSuCuiLavorare;
 
-    MyPanel pannelloSuCuiLavorare;
-    public MyKeyboardAdapter(MyPanel p){
+    public MyKeyboardAdapter(MyPanel p) {
         this.pannelloSuCuiLavorare = p;
     }
+
     @Override
-    public void keyTyped(KeyEvent e) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'keyTyped'");
-    }
-    @Override
-        public void keyPressed(KeyEvent e) {
-    
+    public void keyPressed(KeyEvent e) {
+        int key = e.getKeyCode();
+
+        if (key == KeyEvent.VK_ENTER) {
+            pannelloSuCuiLavorare.iniziaPartita();
+        }
+
+        giocatoreLogico g = pannelloSuCuiLavorare.getGiocatoreLogico();
         
-
-
-        if(e.getKeyChar()=='w'){
-            
+        if (g != null) {
+            if (key == KeyEvent.VK_A || key == KeyEvent.VK_LEFT) {
+                g.muoviSinistra();
+            }
+            if (key == KeyEvent.VK_D || key == KeyEvent.VK_RIGHT) {
+                g.muoviDestra();
+            }
         }
-         if(e.getKeyChar()=='a'){
-            pannelloSuCuiLavorare.gl.muoviDestra();
-            pannelloSuCuiLavorare.gl.update();
-            
-        }
-         if(e.getKeyChar()=='s'){
-        }
-         if(e.getKeyChar()=='d'){
-            pannelloSuCuiLavorare.gl.muoviDestra();
-            pannelloSuCuiLavorare.gl.update();
-            
-        }
-
-
-        
     }
-    @Override
-    public void keyReleased(KeyEvent e) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'keyReleased'");
-    }
-
 }
