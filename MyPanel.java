@@ -5,15 +5,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 class MyPanel extends JPanel {
-
-    public int squareX = 50;
-    public int squareY = 50;
-    public int squareW = 20;
-    public int squareH = 20;
-    public Color square_color = Color.RED;
-    private List<BloccoGrafico> listaBlocchi = new ArrayList<>();
     private  int larghezzaPannello=1000;
     private int altezzaPannello=700;
+
+    private int larghezzaPiattaforma=140;
+    private int altezzaPiattaforma=20;
+    
+    public giocatoreLogico gl= new giocatoreLogico((larghezzaPannello-larghezzaPiattaforma)/2, 50, larghezzaPiattaforma, altezzaPiattaforma,larghezzaPannello );
+    public GiocatoreGrafico piattaforma = new GiocatoreGrafico(gl, Color.BLACK);
+    private List<BloccoGrafico> listaBlocchi = new ArrayList<>();
+   
 
     private Image sfondo;
 
@@ -21,30 +22,26 @@ class MyPanel extends JPanel {
 
         int nRighe=6;
         int nColonne=7;
-        int spazioTraIBlocchi=11;
+    
         setBorder(BorderFactory.createLineBorder(Color.black));
 
-        double larghezzaBlocco= 130;
+        double larghezzaBlocco= 142.85;
         double altezzaBlocco=25;
-        int margineVerticaleInizialeDallaCimaDelPannello = 10;
+        
 
 
         for (int i = 0; i < nRighe; i++) {
             for (int j = 0; j < nColonne; j++) {
-                double x= spazioTraIBlocchi + j *(larghezzaBlocco +spazioTraIBlocchi);
-                double y = margineVerticaleInizialeDallaCimaDelPannello + i *(altezzaBlocco +spazioTraIBlocchi);
+                double x=  j *larghezzaBlocco ;
+                double y =  i *altezzaBlocco ;
                 Punto punto = new Punto(x, y);
                 BloccoLogico logico = new BloccoLogico(punto, altezzaBlocco, larghezzaBlocco);
                 listaBlocchi.add(new BloccoGrafico(logico));
             }
         }
       
-        sfondo= new ImageIcon("resources/secondosfondoprovvisorio.jpg").getImage();
+        sfondo= new ImageIcon("resources/Possibilesfondo.jpg").getImage();
         
-
-
-
-
         // Aggiungo mouse listener
         MyMouseAdapter mouse = new MyMouseAdapter(this);
         addMouseListener(mouse);
@@ -57,18 +54,10 @@ class MyPanel extends JPanel {
     }
 
 
-
-
-
     @Override
     public Dimension getPreferredSize() {
         return new Dimension(larghezzaPannello, altezzaPannello);
     }
-
-
-
-
-
 
 
     @Override
@@ -82,7 +71,7 @@ class MyPanel extends JPanel {
             super.paintComponent(g);
         }
 
-
+        piattaforma.disegna(g);
 
 
         for(BloccoGrafico b : listaBlocchi){    

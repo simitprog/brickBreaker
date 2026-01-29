@@ -13,21 +13,7 @@ public class MyMouseAdapter implements MouseListener{
 
     @Override   
     public void mousePressed(java.awt.event.MouseEvent e) {
-       if (e.getX() >= pannelloSuCuiLavorare.squareX &&
-            e.getX() <= pannelloSuCuiLavorare.squareX + pannelloSuCuiLavorare.squareW &&
-            e.getY() >= pannelloSuCuiLavorare.squareY &&
-            e.getY() <= pannelloSuCuiLavorare.squareY + pannelloSuCuiLavorare.squareH)
-      {
-        int r,g,b;
-        r=(int)(Math.random()*256);
-        g=(int)(Math.random()*256);
-        b=(int)(Math.random()*256);
-
-        Color colore = new Color(r,g,b);
     
-        pannelloSuCuiLavorare.square_color= colore ;
-        pannelloSuCuiLavorare.repaint();
-       }
     }
     
 

@@ -20,16 +20,22 @@ public class MyKeyboardAdapter implements KeyListener{
         public void keyPressed(KeyEvent e) {
     
         
-        int step = 20; 
+
 
         if(e.getKeyChar()=='w'){
             
         }
          if(e.getKeyChar()=='a'){
+            pannelloSuCuiLavorare.gl.muoviDestra();
+            pannelloSuCuiLavorare.gl.update();
+            
         }
          if(e.getKeyChar()=='s'){
         }
          if(e.getKeyChar()=='d'){
+            pannelloSuCuiLavorare.gl.muoviDestra();
+            pannelloSuCuiLavorare.gl.update();
+            
         }
 
 
