@@ -1,0 +1,87 @@
+public class BonusLogico extends Thread{
+    private String tipoBonus;
+    private Punto coordinate;
+    private int velocitaCaduta,durataEffetto;
+    private boolean preso;
+    private MyPanel pannello;
+
+
+
+
+
+    public BonusLogico(int x,int y, int velocitaCaduta, int durataEffetto,MyPanel p) {
+        int numerorandom=(int)(Math.random()*3);
+        if(numerorandom==0){tipoBonus="Barralunga";}
+        else if(numerorandom==1){tipoBonus="DuplicaPallina";}
+        else{tipoBonus="VelocizzaBarra";}
+        this.velocitaCaduta=velocitaCaduta;
+        this.coordinate=new Punto(x, y);
+        this.durataEffetto=durataEffetto;
+        this.preso=false;
+        pannello=p;
+    }
+
+    public void muovi(){
+        coordinate.setY(coordinate.getY()+velocitaCaduta);
+    }
+
+
+    @Override 
+    public void run(){
+        while(preso==false || coordinate.getY()<700){
+            controllaCollisione(pannello.gl);
+            muovi();
+            try{
+                Thread.sleep(velocitaCaduta);
+            }catch(InterruptedException e){
+
+            }
+            
+        }
+    }
+
+    public void controllaCollisione(giocatoreLogico g){
+
+       if(coordinate.getY()==g.getPosizione().getY()){
+         if(coordinate.getX()>=g.getPosizione().getX()||coordinate.getX()<=g.getLarghezza()){
+            preso=true;
+        }
+       }
+
+    }
+
+       public String getTipoBonus() {
+        return tipoBonus;
+    }
+
+    public void setTipoBonus(String tipoBonus) {
+        this.tipoBonus = tipoBonus;
+    }
+
+    public Punto getCoordinate() {
+        return coordinate;
+    }
+
+    public void setCoordinate(Punto coordinate) {
+        this.coordinate = coordinate;
+    }
+
+    public int getVelocitaCaduta() {
+        return velocitaCaduta;
+    }
+
+    public void setVelocitaCaduta(int velocitaCaduta) {
+        this.velocitaCaduta = velocitaCaduta;
+    }
+
+    public int getDurataEffetto() {
+        return durataEffetto;
+    }
+
+    public void setDurataEffetto(int durataEffetto) {
+        this.durataEffetto = durataEffetto;
+    } 
+
+
+
+}
