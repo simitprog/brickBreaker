@@ -2,6 +2,7 @@ public class BloccoLogico {
     public Punto posizione;
     public double altezza,larghezza;
     public boolean distrutto;
+    public BonusLogico bonus;
 
 
     public Punto getPosizione() {

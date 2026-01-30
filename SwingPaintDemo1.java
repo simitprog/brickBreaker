@@ -17,7 +17,7 @@ public class SwingPaintDemo1 {
     
     private static void createAndShowGUI() {
         
-        JFrame f = new JFrame("MARIO");
+        JFrame f = new JFrame("BrickBreaker67");
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.setSize(1000,700);
         MyPanel p = new MyPanel();

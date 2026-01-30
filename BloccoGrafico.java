@@ -42,6 +42,7 @@ public class BloccoGrafico {
             g.setColor(Color.BLACK);
             g.drawRect(x, y, larghezza, altezza);
         }
+        
     }
 
 

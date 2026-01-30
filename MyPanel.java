@@ -23,7 +23,9 @@ class MyPanel extends JPanel {
     public PallinaGrafica palla = new PallinaGrafica(pl, Color.RED);
 
     private List<BloccoGrafico> listaBlocchi = new ArrayList<>();
+    private List<BonusGrafico>listaBonus = new ArrayList<>();
     private Image sfondo;
+    private Image immagineBonus= new ImageIcon("resources/IconBonus.webp").getImage();
 
     public MyPanel() {
         int nRighe = 6;
@@ -85,6 +87,14 @@ class MyPanel extends JPanel {
         for (BloccoGrafico b : listaBlocchi) {
             if (b.getLogico().collisione(pl)) {
                 pl.invertiY();
+                
+                    int x=(int) b.getLogico().posizione.getX();
+                    int y=(int) b.getLogico().posizione.getY();
+                   BonusLogico boL= new BonusLogico(x,y,1350,40, this);
+                   BonusGrafico boG= new BonusGrafico(boL, sfondo, this);
+                    listaBonus.add(boG);
+                   new Thread(boL).start();
+                
             }
         }
     }
@@ -103,6 +113,10 @@ class MyPanel extends JPanel {
         palla.disegna(g);
         for (BloccoGrafico b : listaBlocchi) {
             b.disegna(g);
+        }
+
+        for(BonusGrafico bo: listaBonus){
+            bo.disegna(g);
         }
 
         // 3. Overlay INIZIO GIOCO
