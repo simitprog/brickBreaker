@@ -25,7 +25,7 @@ class MyPanel extends JPanel {
     private List<BloccoGrafico> listaBlocchi = new ArrayList<>();
     private List<BonusGrafico>listaBonus = new ArrayList<>();
     private Image sfondo;
-    private Image immagineBonus= new ImageIcon("resources/IconBonus.webp").getImage();
+    private Image immagineBonus= new ImageIcon("resources/IconBonus.jpg").getImage();
 
     public MyPanel() {
         int nRighe = 6;
@@ -87,14 +87,16 @@ class MyPanel extends JPanel {
         for (BloccoGrafico b : listaBlocchi) {
             if (b.getLogico().collisione(pl)) {
                 pl.invertiY();
-                
+
+                //Ogni volta che viene distrutto un blocco ho un 20% di spawnare un blocco che, per comodità aggiungo a una lista;
+                if(Math.random()<0.20){
                     int x=(int) b.getLogico().posizione.getX();
                     int y=(int) b.getLogico().posizione.getY();
-                   BonusLogico boL= new BonusLogico(x,y,1350,40, this);
-                   BonusGrafico boG= new BonusGrafico(boL, sfondo, this);
+                   BonusLogico boL= new BonusLogico(x,y,40,10000, this);
+                   BonusGrafico boG= new BonusGrafico(boL, immagineBonus, this);
                     listaBonus.add(boG);
                    new Thread(boL).start();
-                
+                }
             }
         }
     }
@@ -118,6 +120,7 @@ class MyPanel extends JPanel {
         for(BonusGrafico bo: listaBonus){
             bo.disegna(g);
         }
+        
 
         // 3. Overlay INIZIO GIOCO
         if (!giocoIniziato && !gameOver) {
@@ -156,6 +159,13 @@ class MyPanel extends JPanel {
             this.pl.setAttiva(true);
         }
     }
+
+    public void rimuoviBonus(BonusLogico logico) {
+    // Rimuove dalla lista l'elemento grafico che contiene quel BonusLogico
+    listaBonus.removeIf(bg -> bg.getBonus() == logico);
+}
+
+   
 
     @Override
     public Dimension getPreferredSize() {

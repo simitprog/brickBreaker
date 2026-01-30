@@ -9,6 +9,7 @@ public class BonusLogico extends Thread{
 
 
 
+
     public BonusLogico(int x,int y, int velocitaCaduta, int durataEffetto,MyPanel p) {
         int numerorandom=(int)(Math.random()*3);
         if(numerorandom==0){tipoBonus="Barralunga";}
@@ -22,13 +23,13 @@ public class BonusLogico extends Thread{
     }
 
     public void muovi(){
-        coordinate.setY(coordinate.getY()+velocitaCaduta);
+        coordinate.setY(coordinate.getY()+5);
     }
 
 
     @Override 
     public void run(){
-        while(preso==false || coordinate.getY()<700){
+        while(preso==false && coordinate.getY()<700){
             controllaCollisione(pannello.gl);
             muovi();
             try{
@@ -38,6 +39,7 @@ public class BonusLogico extends Thread{
             }
             
         }
+        pannello.rimuoviBonus(this);
     }
 
     public void controllaCollisione(giocatoreLogico g){
@@ -82,6 +84,21 @@ public class BonusLogico extends Thread{
         this.durataEffetto = durataEffetto;
     } 
 
+    public boolean isPreso() {
+        return preso;
+    }
+
+    public void setPreso(boolean preso) {
+        this.preso = preso;
+    }
+
+    public MyPanel getPannello() {
+        return pannello;
+    }
+
+    public void setPannello(MyPanel pannello) {
+        this.pannello = pannello;
+    }
 
 
 }
