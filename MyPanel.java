@@ -133,6 +133,10 @@ class MyPanel extends JPanel {
             g.setColor(new Color(0, 0, 0, 150));
             g.fillRect(0, 0, larghezzaPannello, altezzaPannello);
             disegnaMessaggioCentrale(g, "GAME OVER", Color.RED);
+
+            g.setFont(new Font("Verdana", Font.PLAIN, 20));
+            g.setColor(Color.WHITE);
+            g.drawString("Premi 'R' per ricominciare", (larghezzaPannello / 2) - 130, (altezzaPannello / 2) + 50);
         }
     }
 
@@ -181,6 +185,34 @@ class MyPanel extends JPanel {
     }
     public boolean isGiocoIniziato() {
     return giocoIniziato;
+    }
+
+    public void resetGioco() {
+    this.gameOver = false;
+    this.giocoIniziato = false;
+
+    gl.getPosizione().setX((larghezzaPannello - larghezzaPiattaforma) / 2);
+    gl.getPosizione().setY(630);
+
+    pl.getPosizione().setX(500);
+    pl.getPosizione().setY(600);
+    pl.setAttiva(false);
+
+    //Ricro mattoncini
+    listaBlocchi.clear();
+    
+    double larghezzaBlocco = 142.85;
+    double altezzaBlocco = 25;
+    for (int i = 0; i < 6; i++) {
+        for (int j = 0; j < 7; j++) {
+            double x = j * larghezzaBlocco;
+            double y = i * altezzaBlocco;
+            listaBlocchi.add(new BloccoGrafico(new BloccoLogico(new Punto(x, y), altezzaBlocco, larghezzaBlocco)));
+        }
+    }
+
+    repaint();
+    requestFocusInWindow();
 }
 
 }

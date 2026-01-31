@@ -14,22 +14,21 @@ public class MyKeyboardAdapter extends KeyAdapter {
     }
 
     @Override
-    public void keyPressed(KeyEvent e) {
-        int key = e.getKeyCode();
+public void keyPressed(KeyEvent e) {
+    int key = e.getKeyCode();
 
-        if (key == KeyEvent.VK_ENTER) {
-            pannelloSuCuiLavorare.iniziaPartita();
-        }
-
-        giocatoreLogico g = pannelloSuCuiLavorare.getGiocatoreLogico();
-        
-        if (g != null) {
-            if (key == KeyEvent.VK_A || key == KeyEvent.VK_LEFT) {
-                g.muoviSinistra();
-            }
-            if (key == KeyEvent.VK_D || key == KeyEvent.VK_RIGHT) {
-                g.muoviDestra();
-            }
-        }
+    if (key == KeyEvent.VK_ENTER) {
+        pannelloSuCuiLavorare.iniziaPartita();
     }
+
+    if (key == KeyEvent.VK_R) {
+        pannelloSuCuiLavorare.resetGioco();
+    }
+
+    giocatoreLogico g = pannelloSuCuiLavorare.getGiocatoreLogico();
+    if (g != null && !pannelloSuCuiLavorare.isGameOver()) {
+        if (key == KeyEvent.VK_A || key == KeyEvent.VK_LEFT) g.muoviSinistra();
+        if (key == KeyEvent.VK_D || key == KeyEvent.VK_RIGHT) g.muoviDestra();
+    }
+}
 }
