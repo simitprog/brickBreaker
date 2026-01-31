@@ -7,6 +7,9 @@ public class giocatoreLogico {
     private double larghezza;
     private double altezza;
     private double velocita;
+    
+
+
     private double limiteSchermoX;
 
     // Direzione: -1 (sinistra), 0 (fermo), 1 (destra)
@@ -55,4 +58,13 @@ public class giocatoreLogico {
     public Punto getPosizione() { return posizione; }
     public double getLarghezza() { return larghezza; }
     public double getAltezza() { return altezza; }
+
+
+    //setter
+     public void setLarghezza(double larghezza) {
+        this.larghezza = larghezza;
+    }
+    public void setVelocita(double velocita) {
+        this.velocita = velocita;
+    }
 }

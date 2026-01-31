@@ -34,13 +34,44 @@ public class BonusLogico extends Thread{
             muovi();
             try{
                 Thread.sleep(velocitaCaduta);
-            }catch(InterruptedException e){
-
-            }
-            
+            }catch(InterruptedException e){}
         }
-        pannello.rimuoviBonus(this);
+            pannello.rimuoviBonus(this); 
+
+            if(preso==true){
+                attivaEffetto();
+                try{
+                    Thread.sleep(durataEffetto);
+                }catch(InterruptedException e){}
+                rimuoviEffetto();
+            }
+           
+        }
+        
+    
+
+
+
+
+    public void attivaEffetto(){
+        if(tipoBonus=="Barralunga"){
+            pannello.gl.setLarghezza(240);
+        }else if(tipoBonus=="VelocizzaBarra"){
+            pannello.gl.setVelocita(11.0);
+        }
     }
+
+
+    public void rimuoviEffetto(){
+        if(tipoBonus=="Barralunga"){
+            pannello.gl.setLarghezza(140);
+        }else if(tipoBonus=="VelocizzaBarra"){
+            pannello.gl.setVelocita(8.0);
+        }
+    }
+
+
+
 
     public void controllaCollisione(giocatoreLogico g){
 
