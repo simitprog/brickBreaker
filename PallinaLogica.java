@@ -83,7 +83,7 @@ public class PallinaLogica implements Runnable{
                     double distanzaDalCentro=(posizione.getX()+raggio)-centroRacchetta;
 
                     //modifica la velocita' sulla x in modo tale da avere l'effetto di rimbalzo
-                    velX=distanzaDalCentro/10;
+                    velX=distanzaDalCentro/22;
 
                     //la pallina rimbalza e va verso l'alto
                     velY=-velY;
