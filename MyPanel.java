@@ -13,6 +13,7 @@ class MyPanel extends JPanel {
 
     private boolean giocoIniziato = false;
     private boolean gameOver = false;
+    private boolean vittoria = false; // AGGIUNTO: Stato vittoria
     
     // Giocatore (Piattaforma)
     public giocatoreLogico gl = new giocatoreLogico((larghezzaPannello - larghezzaPiattaforma) / 2, 630, larghezzaPiattaforma, altezzaPiattaforma, larghezzaPannello);
@@ -23,9 +24,9 @@ class MyPanel extends JPanel {
     public PallinaGrafica palla = new PallinaGrafica(pl, Color.RED);
 
     private List<BloccoGrafico> listaBlocchi = new ArrayList<>();
-    private List<BonusGrafico>listaBonus = new ArrayList<>();
+    private List<BonusGrafico> listaBonus = new ArrayList<>();
     private Image sfondo;
-    private Image immagineBonus= new ImageIcon("resources/IconBonus.jpg").getImage();
+    private Image immagineBonus = new ImageIcon("resources/IconBonus.jpg").getImage();
 
     public MyPanel() {
         int nRighe = 6;
@@ -36,7 +37,7 @@ class MyPanel extends JPanel {
         double larghezzaBlocco = 142.85;
         double altezzaBlocco = 25;
 
-        // Inizializzazione blocchi
+        //inizializzazione blocchi
         for (int i = 0; i < nRighe; i++) {
             for (int j = 0; j < nColonne; j++) {
                 double x = j * larghezzaBlocco;
@@ -49,18 +50,15 @@ class MyPanel extends JPanel {
       
         sfondo = new ImageIcon("resources/Possibilesfondo.jpg").getImage();
         
-        // Avvio del Thread della pallina (partirà ferma perché pl.attiva è false)
         Thread threadPalla = new Thread(pl);
         threadPalla.start();
 
-        // Game Loop
         Timer gameLoop = new Timer(16, e -> {
             updateGame();
             repaint();
         });
         gameLoop.start();
 
-        // Listeners
         MyMouseAdapter mouse = new MyMouseAdapter(this);
         addMouseListener(mouse);
         addMouseMotionListener(mouse); 
@@ -72,32 +70,40 @@ class MyPanel extends JPanel {
     }
 
     private void updateGame() {
-        if (gameOver || !giocoIniziato) return; 
+        if (gameOver || vittoria || !giocoIniziato) return;
 
         gl.update();
         pl.controllaRimbalzoGiocatore(gl);
 
-        // CONTROLLO SCONFITTA
+        //CONTROLLO SCONFITTA
         if (pl.getPosizione().getY() + (pl.getRaggio() * 2) > altezzaPannello) {
             gameOver = true;
             pl.setAttiva(false); 
         }
 
-        // Collisioni blocchi
-        for (BloccoGrafico b : listaBlocchi) {
+        //Collisioni blocchi con RIMOZIONE
+        listaBlocchi.removeIf(b -> {
             if (b.getLogico().collisione(pl)) {
                 pl.invertiY();
 
-                //Ogni volta che viene distrutto un blocco ho un 20% di spawnare un blocco che, per comodità aggiungo a una lista;
-                if(Math.random()<0.20){
-                    int x=(int) b.getLogico().posizione.getX();
-                    int y=(int) b.getLogico().posizione.getY();
-                   BonusLogico boL= new BonusLogico(x,y,40,10000, this);
-                   BonusGrafico boG= new BonusGrafico(boL, immagineBonus, this);
+                // Spawn Bonus 20%
+                if (Math.random() < 0.20) {
+                    int x = (int) b.getLogico().posizione.getX();
+                    int y = (int) b.getLogico().posizione.getY();
+                    BonusLogico boL = new BonusLogico(x, y, 40, 10000, this);
+                    BonusGrafico boG = new BonusGrafico(boL, immagineBonus, this);
                     listaBonus.add(boG);
-                   new Thread(boL).start();
+                    new Thread(boL).start();
                 }
+                return true; //rimuovo il blocco dalla lista
             }
+            return false;
+        });
+
+        //Controllo se la lista blocchi è vuota
+        if (listaBlocchi.isEmpty()) {
+            vittoria = true;
+            pl.setAttiva(false);
         }
     }
 
@@ -105,31 +111,38 @@ class MyPanel extends JPanel {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        // 1. Disegno Sfondo
         if (sfondo != null) {
             g.drawImage(sfondo, 0, 0, larghezzaPannello, altezzaPannello, this);
         }
 
-        // 2. Disegno Entità
         piattaforma.disegna(g);
         palla.disegna(g);
         for (BloccoGrafico b : listaBlocchi) {
             b.disegna(g);
         }
 
-        for(BonusGrafico bo: listaBonus){
+        for (BonusGrafico bo : listaBonus) {
             bo.disegna(g);
         }
-        
 
-        // 3. Overlay INIZIO GIOCO
-        if (!giocoIniziato && !gameOver) {
+        // Overlay INIZIO GIOCO
+        if (!giocoIniziato && !gameOver && !vittoria) {
             disegnaMessaggioCentrale(g, "PREMI INVIO PER GIOCARE", Color.WHITE);
         }
 
-        // 4. Overlay GAME OVER
+        //overlay di vittoria
+        if (vittoria) {
+            g.setColor(new Color(0, 0, 0, 150));
+            g.fillRect(0, 0, larghezzaPannello, altezzaPannello);
+            disegnaMessaggioCentrale(g, "VITTORIA!", Color.GREEN);
+            
+            g.setFont(new Font("Verdana", Font.PLAIN, 20));
+            g.setColor(Color.WHITE);
+            g.drawString("Premi 'R' per ricominciare", (larghezzaPannello / 2) - 130, (altezzaPannello / 2) + 50);
+        }
+
+        //overlay di game over
         if (gameOver) {
-            // Sfondo scuro semitrasparente per dare enfasi al Game Over
             g.setColor(new Color(0, 0, 0, 150));
             g.fillRect(0, 0, larghezzaPannello, altezzaPannello);
             disegnaMessaggioCentrale(g, "GAME OVER", Color.RED);
@@ -140,36 +153,28 @@ class MyPanel extends JPanel {
         }
     }
 
-    /**
-     * Metodo di utility per disegnare testo centrato
-     */
     private void disegnaMessaggioCentrale(Graphics g, String testo, Color colore) {
         g.setFont(new Font("Verdana", Font.BOLD, 40));
         FontMetrics fm = g.getFontMetrics();
         int x = (larghezzaPannello - fm.stringWidth(testo)) / 2;
         int y = altezzaPannello / 2;
 
-        // Ombra
         g.setColor(Color.BLACK);
         g.drawString(testo, x + 3, y + 3);
-        // Testo principale
         g.setColor(colore);
         g.drawString(testo, x, y);
     }
 
     public void iniziaPartita() {
-        if (!gameOver) {
+        if (!gameOver && !vittoria) {
             this.giocoIniziato = true;
             this.pl.setAttiva(true);
         }
     }
 
     public void rimuoviBonus(BonusLogico logico) {
-    // Rimuove dalla lista l'elemento grafico che contiene quel BonusLogico
-    listaBonus.removeIf(bg -> bg.getBonus() == logico);
-}
-
-   
+        listaBonus.removeIf(bg -> bg.getBonus() == logico);
+    }
 
     @Override
     public Dimension getPreferredSize() {
@@ -183,36 +188,41 @@ class MyPanel extends JPanel {
     public boolean isGameOver() {
         return gameOver;
     }
+
+    public boolean isVittoria() {
+        return vittoria;
+    }
+
     public boolean isGiocoIniziato() {
-    return giocoIniziato;
+        return giocoIniziato;
     }
 
     public void resetGioco() {
-    this.gameOver = false;
-    this.giocoIniziato = false;
+        this.gameOver = false;
+        this.vittoria = false;
+        this.giocoIniziato = false;
 
-    gl.getPosizione().setX((larghezzaPannello - larghezzaPiattaforma) / 2);
-    gl.getPosizione().setY(630);
+        gl.getPosizione().setX((larghezzaPannello - larghezzaPiattaforma) / 2);
+        gl.getPosizione().setY(630);
 
-    pl.getPosizione().setX(500);
-    pl.getPosizione().setY(600);
-    pl.setAttiva(false);
+        pl.getPosizione().setX(500);
+        pl.getPosizione().setY(600);
+        pl.setAttiva(false);
 
-    //Ricro mattoncini
-    listaBlocchi.clear();
-    
-    double larghezzaBlocco = 142.85;
-    double altezzaBlocco = 25;
-    for (int i = 0; i < 6; i++) {
-        for (int j = 0; j < 7; j++) {
-            double x = j * larghezzaBlocco;
-            double y = i * altezzaBlocco;
-            listaBlocchi.add(new BloccoGrafico(new BloccoLogico(new Punto(x, y), altezzaBlocco, larghezzaBlocco)));
+        listaBlocchi.clear();
+        listaBonus.clear();
+        
+        double larghezzaBlocco = 142.85;
+        double altezzaBlocco = 25;
+        for (int i = 0; i < 6; i++) {
+            for (int j = 0; j < 7; j++) {
+                double x = j * larghezzaBlocco;
+                double y = i * altezzaBlocco;
+                listaBlocchi.add(new BloccoGrafico(new BloccoLogico(new Punto(x, y), altezzaBlocco, larghezzaBlocco)));
+            }
         }
+
+        repaint();
+        requestFocusInWindow();
     }
-
-    repaint();
-    requestFocusInWindow();
-}
-
 }

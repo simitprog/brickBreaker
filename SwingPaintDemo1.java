@@ -1,6 +1,5 @@
 
 import javax.swing.SwingUtilities;
-import javax.swing.plaf.DimensionUIResource;
 import javax.swing.JFrame;
 
 public class SwingPaintDemo1 {
