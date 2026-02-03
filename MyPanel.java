@@ -13,12 +13,13 @@ class MyPanel extends JPanel {
 
     private boolean giocoIniziato = false;
     private boolean gameOver = false;
-    private boolean vittoria = false; // AGGIUNTO: Stato vittoria
-    
-    // Giocatore (Piattaforma)
-    public giocatoreLogico gl = new giocatoreLogico((larghezzaPannello - larghezzaPiattaforma) / 2, 630, larghezzaPiattaforma, altezzaPiattaforma, larghezzaPannello);
+    private boolean vittoria = false;
+
+    // Giocatore
+    public giocatoreLogico gl = new giocatoreLogico((larghezzaPannello - larghezzaPiattaforma) / 2, 630,
+            larghezzaPiattaforma, altezzaPiattaforma, larghezzaPannello);
     public GiocatoreGrafico piattaforma = new GiocatoreGrafico(gl, Color.BLACK);
-    
+
     // Pallina
     public PallinaLogica pl = new PallinaLogica(500, 600, 10, larghezzaPannello, altezzaPannello);
     public PallinaGrafica palla = new PallinaGrafica(pl, Color.RED);
@@ -31,13 +32,13 @@ class MyPanel extends JPanel {
     public MyPanel() {
         int nRighe = 6;
         int nColonne = 7;
-    
+
         setBorder(BorderFactory.createLineBorder(Color.black));
 
         double larghezzaBlocco = 142.85;
         double altezzaBlocco = 25;
 
-        //inizializzazione blocchi
+        // inizializzazione blocchi
         for (int i = 0; i < nRighe; i++) {
             for (int j = 0; j < nColonne; j++) {
                 double x = j * larghezzaBlocco;
@@ -47,9 +48,9 @@ class MyPanel extends JPanel {
                 listaBlocchi.add(new BloccoGrafico(logico));
             }
         }
-      
+
         sfondo = new ImageIcon("resources/Possibilesfondo.jpg").getImage();
-        
+
         Thread threadPalla = new Thread(pl);
         threadPalla.start();
 
@@ -59,9 +60,9 @@ class MyPanel extends JPanel {
         });
         gameLoop.start();
 
-        MyMouseAdapter mouse = new MyMouseAdapter(this);
-        addMouseListener(mouse);
-        addMouseMotionListener(mouse); 
+        // MyMouseAdapter mouse = new MyMouseAdapter(this);
+        // addMouseListener(mouse);
+        // addMouseMotionListener(mouse);
 
         MyKeyboardAdapter keyboard = new MyKeyboardAdapter(this);
         setFocusable(true);
@@ -70,18 +71,19 @@ class MyPanel extends JPanel {
     }
 
     private void updateGame() {
-        if (gameOver || vittoria || !giocoIniziato) return;
+        if (gameOver || vittoria || !giocoIniziato)
+            return;
 
         gl.update();
         pl.controllaRimbalzoGiocatore(gl);
 
-        //CONTROLLO SCONFITTA
+        // CONTROLLO SCONFITTA
         if (pl.getPosizione().getY() + (pl.getRaggio() * 2) > altezzaPannello) {
             gameOver = true;
-            pl.setAttiva(false); 
+            pl.setAttiva(false);
         }
 
-        //Collisioni blocchi con RIMOZIONE
+        // Collisioni blocchi con RIMOZIONE
         listaBlocchi.removeIf(b -> {
             if (b.getLogico().collisione(pl)) {
                 pl.invertiY();
@@ -95,12 +97,12 @@ class MyPanel extends JPanel {
                     listaBonus.add(boG);
                     new Thread(boL).start();
                 }
-                return true; //rimuovo il blocco dalla lista
+                return true; // rimuovo il blocco dalla lista
             }
             return false;
         });
 
-        //Controllo se la lista blocchi è vuota
+        // Controllo se la lista blocchi è vuota
         if (listaBlocchi.isEmpty()) {
             vittoria = true;
             pl.setAttiva(false);
@@ -130,18 +132,18 @@ class MyPanel extends JPanel {
             disegnaMessaggioCentrale(g, "PREMI INVIO PER GIOCARE", Color.WHITE);
         }
 
-        //overlay di vittoria
+        // overlay di vittoria
         if (vittoria) {
             g.setColor(new Color(0, 0, 0, 150));
             g.fillRect(0, 0, larghezzaPannello, altezzaPannello);
             disegnaMessaggioCentrale(g, "VITTORIA!", Color.GREEN);
-            
+
             g.setFont(new Font("Verdana", Font.PLAIN, 20));
             g.setColor(Color.WHITE);
             g.drawString("Premi 'R' per ricominciare", (larghezzaPannello / 2) - 130, (altezzaPannello / 2) + 50);
         }
 
-        //overlay di game over
+        // overlay di game over
         if (gameOver) {
             g.setColor(new Color(0, 0, 0, 150));
             g.fillRect(0, 0, larghezzaPannello, altezzaPannello);
@@ -211,7 +213,7 @@ class MyPanel extends JPanel {
 
         listaBlocchi.clear();
         listaBonus.clear();
-        
+
         double larghezzaBlocco = 142.85;
         double altezzaBlocco = 25;
         for (int i = 0; i < 6; i++) {
