@@ -211,6 +211,8 @@ class MyPanel extends JPanel {
 
     public void iniziaPartita() {
         if (!gameOver && !vittoria) {
+            listaPallineGrafiche.clear();
+            listaPallineLogiche.clear();
             listaPallineLogiche.add(pl);
             listaPallineGrafiche.add(palla);
             this.giocoIniziato = true;
@@ -247,7 +249,11 @@ class MyPanel extends JPanel {
         this.gameOver = false;
         this.vittoria = false;
         this.giocoIniziato = false;
+        this.numPalline=1;
 
+        
+
+        //reset posizione giocatore
         gl.getPosizione().setX((larghezzaPannello - larghezzaPiattaforma) / 2);
         gl.getPosizione().setY(630);
 
@@ -257,6 +263,8 @@ class MyPanel extends JPanel {
 
         listaBlocchi.clear();
         listaBonus.clear();
+        listaPallineGrafiche.clear();
+        listaPallineLogiche.clear();
 
         double larghezzaBlocco = 142.85;
         double altezzaBlocco = 25;
