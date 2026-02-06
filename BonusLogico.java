@@ -29,7 +29,7 @@ public class BonusLogico extends Thread{
 
     @Override 
     public void run(){
-        while(preso==false && coordinate.getY()<700){
+        while(preso==false && coordinate.getY()<700&&pannello.isGameOver()==false){
             controllaCollisione(pannello.gl);
             muovi();
             try{
