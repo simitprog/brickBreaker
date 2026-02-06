@@ -58,6 +58,11 @@ public class BonusLogico extends Thread{
             pannello.gl.setLarghezza(240);
         }else if(tipoBonus=="VelocizzaBarra"){
             pannello.gl.setVelocita(11.0);
+        }else if(tipoBonus=="DuplicaPallina"){
+            if(pannello.numPalline!=0){
+                PallinaLogica esistente= pannello.listaPallineLogiche.get(0);
+                pannello.aggiungiPallina(esistente.getPosizione().getX(),esistente.getPosizione().getY());
+            }
         }
     }
 

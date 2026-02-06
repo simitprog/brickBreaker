@@ -24,6 +24,11 @@ class MyPanel extends JPanel {
     public PallinaLogica pl = new PallinaLogica(500, 600, 10, larghezzaPannello, altezzaPannello);
     public PallinaGrafica palla = new PallinaGrafica(pl, Color.RED);
 
+    public List<PallinaGrafica> listaPallineGrafiche= new ArrayList<>();
+    public List<PallinaLogica>listaPallineLogiche=new ArrayList<>();
+    public int numPalline=1;
+
+
     private List<BloccoGrafico> listaBlocchi = new ArrayList<>();
     private List<BonusGrafico> listaBonus = new ArrayList<>();
     private Image sfondo;
@@ -75,39 +80,74 @@ class MyPanel extends JPanel {
             return;
 
         gl.update();
-        pl.controllaRimbalzoGiocatore(gl);
+
+        for (int i = listaPallineLogiche.size()-1; i>=0; i--) {
+            listaPallineLogiche.get(i).controllaRimbalzoGiocatore(gl);
+        }
+        
 
         // CONTROLLO SCONFITTA
-        if (pl.getPosizione().getY() + (pl.getRaggio() * 2) > altezzaPannello) {
-            gameOver = true;
-            pl.setAttiva(false);
+         for (int i = listaPallineLogiche.size()-1; i>=0; i--) {
+            if(listaPallineLogiche.get(i).getPosizione().getY()+(listaPallineLogiche.get(i).getRaggio()*2)>altezzaPannello){
+                listaPallineLogiche.get(i).setAttiva(false);
+                listaPallineGrafiche.remove(i);
+                listaPallineLogiche.remove(i);
+                numPalline--;
+            }
         }
+        
+
+
 
         // Collisioni blocchi con RIMOZIONE
-        listaBlocchi.removeIf(b -> {
-            if (b.getLogico().collisione(pl)) {
-                pl.invertiY();
+       for (int i = 0; i < listaPallineLogiche.size(); i++) {
+    PallinaLogica pCorrente = listaPallineLogiche.get(i);
+    
+    listaBlocchi.removeIf(b -> {
+        if (b.getLogico().collisione(pCorrente)) {
+            pCorrente.invertiY(); // La pallina che ha colpito rimbalza
 
-                // Spawn Bonus 20%
-                if (Math.random() < 0.20) {
-                    int x = (int) b.getLogico().posizione.getX();
-                    int y = (int) b.getLogico().posizione.getY();
-                    BonusLogico boL = new BonusLogico(x, y, 40, 10000, this);
-                    BonusGrafico boG = new BonusGrafico(boL, immagineBonus, this);
-                    listaBonus.add(boG);
-                    new Thread(boL).start();
-                }
-                return true; // rimuovo il blocco dalla lista
+            // Spawn Bonus 20%
+            if (Math.random() < 0.20) {
+                int bx = (int) b.getLogico().posizione.getX();
+                int by = (int) b.getLogico().posizione.getY();
+                BonusLogico boL = new BonusLogico(bx, by, 40, 10000, this);
+                BonusGrafico boG = new BonusGrafico(boL, immagineBonus, this);
+                listaBonus.add(boG);
+                new Thread(boL).start();
             }
-            return false;
-        });
+            return true; // Rimuove il blocco colpito
+        }
+        return false;
+    });
+}   
+
+        //se non ci sono più palline ho perso
+        if(numPalline<=0){gameOver=true;}
 
         // Controllo se la lista blocchi è vuota
         if (listaBlocchi.isEmpty()) {
             vittoria = true;
-            pl.setAttiva(false);
+            for (PallinaLogica ball : listaPallineLogiche) {
+                ball.setAttiva(false);
+            }
         }
     }
+    
+
+    //metodo creato per aggiungere creare una nuova pallina
+    public void aggiungiPallina(double x, double y){
+        PallinaLogica nuova= new PallinaLogica(x, y, 10,larghezzaPannello , altezzaPannello);
+        nuova.setAttiva(true);
+        PallinaGrafica nuovaG=new PallinaGrafica(nuova, Color.RED);
+        listaPallineLogiche.add(nuova);
+        listaPallineGrafiche.add(nuovaG);
+        Thread nuovoThread = new Thread(nuova);
+        nuovoThread.start();
+        numPalline++;
+    }
+
+  
 
     @Override
     public void paintComponent(Graphics g) {
@@ -118,7 +158,9 @@ class MyPanel extends JPanel {
         }
 
         piattaforma.disegna(g);
-        palla.disegna(g);
+        for (PallinaGrafica pg : listaPallineGrafiche) {
+             pg.disegna(g);
+        }
         for (BloccoGrafico b : listaBlocchi) {
             b.disegna(g);
         }
@@ -169,6 +211,8 @@ class MyPanel extends JPanel {
 
     public void iniziaPartita() {
         if (!gameOver && !vittoria) {
+            listaPallineLogiche.add(pl);
+            listaPallineGrafiche.add(palla);
             this.giocoIniziato = true;
             this.pl.setAttiva(true);
         }
