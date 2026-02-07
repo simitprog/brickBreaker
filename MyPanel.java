@@ -43,7 +43,7 @@ class MyPanel extends JPanel {
     private Image imgPausa = new ImageIcon("resources/pause.png").getImage();
     private Image imgPlay = new ImageIcon("resources/play.png").getImage();
     private Rectangle areaBottonePausa = new Rectangle(950, 650, 40, 40);
-    private Rectangle areaBottonePlay=new Rectangle(450, 345, 100,100);
+    private Rectangle areaBottonePlay = new Rectangle(450, 345, 100,100);
 
     // Giocatore
     public giocatoreLogico gl = new giocatoreLogico((larghezzaPannello - larghezzaPiattaforma) / 2, 630,
@@ -65,7 +65,7 @@ class MyPanel extends JPanel {
     private Image immagineGameOver = new ImageIcon("resources/game_over_panel.png").getImage();
 
     public boolean getCanReload(){
-        return gameOver;
+        return gameOver || vittoria;
     }
 
     public MyPanel() {
@@ -140,9 +140,9 @@ class MyPanel extends JPanel {
         }
         // Collisioni blocchi con RIMOZIONE
        for (int i = 0; i < listaPallineLogiche.size(); i++) {
-    PallinaLogica pCorrente = listaPallineLogiche.get(i);
+        PallinaLogica pCorrente = listaPallineLogiche.get(i);
     
-    listaBlocchi.removeIf(b -> {
+        listaBlocchi.removeIf(b -> {
         if (b.getLogico().collisione(pCorrente)) {
             pCorrente.invertiY(); // La pallina che ha colpito rimbalza
 
@@ -227,17 +227,11 @@ class MyPanel extends JPanel {
         // 3. INTERFACCIA UI (Bottoni sempre visibili durante il gioco)
         if (giocoIniziato && !gameOver && !vittoria) {
             
-            // --- BOTTONE PAUSA/PLAY (In basso a destra) ---
-            // Sceglie l'immagine in base allo stato attuale
-            Image immaginePausaCorrente = isPausa ? imgPlay : imgPausa;
+            // --- BOTTONE PAUSA
             
-            if (immaginePausaCorrente != null) {
-                g.drawImage(immaginePausaCorrente, areaBottonePausa.x, areaBottonePausa.y, 
+            if (!isPausa()) {
+                g.drawImage(imgPausa, areaBottonePausa.x, areaBottonePausa.y, 
                             areaBottonePausa.width, areaBottonePausa.height, this);
-            } else {
-                // Emergenza: se le immagini non caricano, disegna un cerchio colorato
-                g.setColor(isPausa ? Color.GREEN : Color.RED);
-                g.fillOval(areaBottonePausa.x, areaBottonePausa.y, areaBottonePausa.width, areaBottonePausa.height);
             }
 
             // --- ICONA VOLUME (In basso a sinistra) ---
@@ -260,9 +254,30 @@ class MyPanel extends JPanel {
 
         // Schermata di Pausa (Oscura tutto e scrive PAUSA)
         if (isPausa && !gameOver && !vittoria) {
-            g.setColor(new Color(0, 0, 0, 215)); // Nero semitrasparente
+            // 1. Sfondo oscurato
+            g.setColor(new Color(0, 0, 0, 215)); 
             g.fillRect(0, 0, larghezzaPannello, altezzaPannello);
-            disegnaMessaggioCentrale(g, "PAUSA", Color.YELLOW);
+
+            // 2. Scritta PAUSA
+            disegnaMessaggioPausa(g, "PAUSA", Color.YELLOW);
+
+            // 3. Posizionamento dinamico del tasto Play
+            // Calcoliamo il centro per farlo apparire sotto il messaggio
+            int dimensionePlay = 80;
+            areaBottonePlay.x = (larghezzaPannello - dimensionePlay) / 2;
+            areaBottonePlay.y = (altezzaPannello / 2) + 60; // 60 pixel sotto la scritta centrale
+            areaBottonePlay.width = dimensionePlay;
+            areaBottonePlay.height = dimensionePlay;
+
+            // 4. Disegno dell'immagine Play
+            if (imgPlay != null) {
+                g.drawImage(imgPlay, areaBottonePlay.x, areaBottonePlay.y, 
+                            areaBottonePlay.width, areaBottonePlay.height, this);
+            } else {
+                // Piano B: se l'immagine manca, disegna un triangolo o un cerchio verde
+                g.setColor(Color.GREEN);
+                g.fillOval(areaBottonePlay.x, areaBottonePlay.y, dimensionePlay, dimensionePlay);
+            }
         }
 
         // Schermata Vittoria
@@ -308,6 +323,23 @@ class MyPanel extends JPanel {
         FontMetrics fm = g.getFontMetrics();
         int x = (larghezzaPannello - fm.stringWidth(testo)) / 2;
         int y = altezzaPannello / 2;
+
+        // Ombra
+        g.setColor(Color.BLACK);
+        g.drawString(testo, x + 3, y + 3);
+        
+        // Testo principale
+        g.setColor(colore);
+        g.drawString(testo, x, y);
+    }
+
+    private void disegnaMessaggioPausa(Graphics g, String testo, Color colore) {
+        // .deriveFont(float size) cambia la dimensione del font caricato
+        g.setFont(font.deriveFont(70f)); 
+        
+        FontMetrics fm = g.getFontMetrics();
+        int x = (larghezzaPannello - fm.stringWidth(testo)) / 2;
+        int y = altezzaPannello / 2 - 100;
 
         // Ombra
         g.setColor(Color.BLACK);
@@ -481,4 +513,7 @@ class MyPanel extends JPanel {
         return areaBottonePausa;
     }
 
+    public Rectangle getAreaBottonePlay() {
+        return areaBottonePlay;
+    }
 }

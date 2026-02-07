@@ -20,20 +20,29 @@ public class MyMouseAdapter extends MouseAdapter {
         pannelloSuCuiLavorare.requestFocusInWindow();
         Point click = e.getPoint();
 
-        // 1. GESTIONE PAUSA (Bottone in basso a destra)
-        if (pannelloSuCuiLavorare.isGiocoIniziato() && 
-            !pannelloSuCuiLavorare.isGameOver() && 
-            !pannelloSuCuiLavorare.isVittoria()) {
-            
-            Rectangle areaPausa = pannelloSuCuiLavorare.getAreaBottonePausa();
-            if (areaPausa.contains(click)) {
-                pannelloSuCuiLavorare.setPausa(!pannelloSuCuiLavorare.isPausa());
-                return; // Esco così non triggero altri click sovrapposti
+        // 1. GESTIONE PAUSA ATTIVA (Bottone centrale Play)
+        if (pannelloSuCuiLavorare.isPausa() && !pannelloSuCuiLavorare.isGameOver() && !pannelloSuCuiLavorare.isVittoria()) {
+            Rectangle areaPlayCentrale = pannelloSuCuiLavorare.getAreaBottonePlay();
+            if (areaPlayCentrale != null && areaPlayCentrale.contains(click)) {
+                pannelloSuCuiLavorare.setPausa(false); // Riprende il gioco
+                return; 
             }
         }
 
-        // 2. GESTIONE VOLUME (In basso a sinistra)
-        // Definiamo l'area dell'icona volume (stesse coordinate del paintComponent)
+        // 2. GESTIONE TASTO PAUSA STANDARD (In basso a destra, solo se NON è già in pausa)
+        if (pannelloSuCuiLavorare.isGiocoIniziato() && 
+            !pannelloSuCuiLavorare.isGameOver() && 
+            !pannelloSuCuiLavorare.isVittoria() &&
+            !pannelloSuCuiLavorare.isPausa()) {
+            
+            Rectangle areaPausa = pannelloSuCuiLavorare.getAreaBottonePausa();
+            if (areaPausa != null && areaPausa.contains(click)) {
+                pannelloSuCuiLavorare.setPausa(true);
+                return; 
+            }
+        }
+
+        // 3. GESTIONE VOLUME (In basso a sinistra)
         int dimVol = 40;
         int margVol = 10;
         Rectangle areaVolume = new Rectangle(margVol, pannelloSuCuiLavorare.getHeight() - dimVol - margVol, dimVol, dimVol);
@@ -43,7 +52,7 @@ public class MyMouseAdapter extends MouseAdapter {
             return;
         }
 
-        // 3. GESTIONE PLAY AGAIN (Solo in Game Over)
+        // 4. GESTIONE PLAY AGAIN (Solo in Game Over)
         if (pannelloSuCuiLavorare.isGameOver()) {
             Rectangle areaReset = pannelloSuCuiLavorare.getAreaBottone();
             if (areaReset != null && areaReset.contains(click)) {
