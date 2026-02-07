@@ -34,6 +34,14 @@ public class MyMouseAdapter extends MouseAdapter {
                 pannelloSuCuiLavorare.repaint();
             }
         }
+
+        int margine = 20;
+        int dim = 40;
+        Rectangle areaVolume = new Rectangle(margine, pannelloSuCuiLavorare.getHeight() - dim - margine, dim, dim);
+
+        if (areaVolume.contains(e.getPoint())) {
+            pannelloSuCuiLavorare.toggleMute();
+        }
     }
 
     @Override

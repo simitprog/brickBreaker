@@ -36,6 +36,9 @@ class MyPanel extends JPanel {
     private Clip backgroundMusic;
     private boolean isMuted = false;
 
+    private Image imgVolumeOn = new ImageIcon("resources/volumeOn.png").getImage();
+    private Image imgVolumeOff = new ImageIcon("resources/volumeOff.png").getImage();
+
     // Giocatore
     public giocatoreLogico gl = new giocatoreLogico((larghezzaPannello - larghezzaPiattaforma) / 2, 630,
     larghezzaPiattaforma, altezzaPiattaforma, larghezzaPannello);
@@ -125,10 +128,6 @@ class MyPanel extends JPanel {
                 numPalline--;
             }
         }
-        
-
-
-
         // Collisioni blocchi con RIMOZIONE
        for (int i = 0; i < listaPallineLogiche.size(); i++) {
     PallinaLogica pCorrente = listaPallineLogiche.get(i);
@@ -251,6 +250,18 @@ class MyPanel extends JPanel {
             areaBottone.y = (altezzaPannello / 2) + 100;
             g.drawImage(imgCorrente, areaBottone.x, areaBottone.y, areaBottone.width, areaBottone.height, this);
         }
+
+        Image iconaVolume = isMuted ? imgVolumeOff : imgVolumeOn;
+        if (iconaVolume != null) {
+            int dimensioneIcona = 35;
+            int margine = 10;
+            // Posizionamento in basso a sinistra
+            int xIcona = margine;
+            int yIcona = altezzaPannello - dimensioneIcona - margine;
+
+            g.drawImage(iconaVolume, xIcona, yIcona, dimensioneIcona, dimensioneIcona, this);
+        }
+
     }
 
     private void disegnaMessaggioCentrale(Graphics g, String testo, Color colore) {
@@ -407,6 +418,8 @@ class MyPanel extends JPanel {
             isMuted = false;
             System.out.println("Audio ON");
         }
+
+        repaint();
     }
 
 }
