@@ -42,7 +42,8 @@ class MyPanel extends JPanel {
     private boolean isPausa = false;
     private Image imgPausa = new ImageIcon("resources/pause.png").getImage();
     private Image imgPlay = new ImageIcon("resources/play.png").getImage();
-    private Rectangle areaBottonePausa = new Rectangle(880, 630, 50, 50);
+    private Rectangle areaBottonePausa = new Rectangle(950, 650, 40, 40);
+    private Rectangle areaBottonePlay=new Rectangle(450, 345, 100,100);
 
     // Giocatore
     public giocatoreLogico gl = new giocatoreLogico((larghezzaPannello - larghezzaPiattaforma) / 2, 630,
@@ -62,6 +63,10 @@ class MyPanel extends JPanel {
     private List<BonusGrafico> listaBonus = new ArrayList<>();
     private Image sfondo;
     private Image immagineGameOver = new ImageIcon("resources/game_over_panel.png").getImage();
+
+    public boolean getCanReload(){
+        return gameOver;
+    }
 
     public MyPanel() {
         int nRighe = 6;
@@ -255,14 +260,14 @@ class MyPanel extends JPanel {
 
         // Schermata di Pausa (Oscura tutto e scrive PAUSA)
         if (isPausa && !gameOver && !vittoria) {
-            g.setColor(new Color(0, 0, 0, 150)); // Nero semitrasparente
+            g.setColor(new Color(0, 0, 0, 215)); // Nero semitrasparente
             g.fillRect(0, 0, larghezzaPannello, altezzaPannello);
             disegnaMessaggioCentrale(g, "PAUSA", Color.YELLOW);
         }
 
         // Schermata Vittoria
         if (vittoria) {
-            g.setColor(new Color(0, 0, 0, 180));
+            g.setColor(new Color(0, 0, 0, 215));
             g.fillRect(0, 0, larghezzaPannello, altezzaPannello);
             disegnaMessaggioCentrale(g, "VITTORIA!", Color.GREEN);
             
@@ -275,9 +280,11 @@ class MyPanel extends JPanel {
         if (gameOver) {
             // Disegna sfondo Game Over
             if (immagineGameOver != null) {
+                g.setColor(new Color(0, 0, 0, 215));
+                g.fillRect(0, 0, larghezzaPannello, altezzaPannello);
                 g.drawImage(immagineGameOver, 0, 0, larghezzaPannello, altezzaPannello, this);
             } else {
-                g.setColor(new Color(0, 0, 0, 200));
+                g.setColor(new Color(0, 0, 0, 215));
                 g.fillRect(0, 0, larghezzaPannello, altezzaPannello);
             }
 

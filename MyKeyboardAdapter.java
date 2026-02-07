@@ -23,7 +23,7 @@ public class MyKeyboardAdapter extends KeyAdapter {
         }
 
         // 2. Reset del gioco
-        if (key == KeyEvent.VK_R) {
+        if (key == KeyEvent.VK_R && pannelloSuCuiLavorare.getCanReload()) {
             pannelloSuCuiLavorare.resetGioco();
         }
 
