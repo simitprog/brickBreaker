@@ -17,7 +17,7 @@ class MyPanel extends JPanel {
 
     // Giocatore
     public giocatoreLogico gl = new giocatoreLogico((larghezzaPannello - larghezzaPiattaforma) / 2, 630,
-            larghezzaPiattaforma, altezzaPiattaforma, larghezzaPannello);
+    larghezzaPiattaforma, altezzaPiattaforma, larghezzaPannello);
     public GiocatoreGrafico piattaforma = new GiocatoreGrafico(gl, Color.BLACK);
 
     // Pallina
@@ -54,7 +54,7 @@ class MyPanel extends JPanel {
             }
         }
 
-        sfondo = new ImageIcon("resources/Possibilesfondo.jpg").getImage();
+        sfondo = new ImageIcon("resources/bg1.png").getImage(); //c'e' n'e' un altro nelle resources, pero' questo fa vedere meglio la pallina
 
         Thread threadPalla = new Thread(pl);
         threadPalla.start();
@@ -65,9 +65,9 @@ class MyPanel extends JPanel {
         });
         gameLoop.start();
 
-        // MyMouseAdapter mouse = new MyMouseAdapter(this);
-        // addMouseListener(mouse);
-        // addMouseMotionListener(mouse);
+        //MyMouseAdapter mouse = new MyMouseAdapter(this);
+        //addMouseListener(mouse);
+        //addMouseMotionListener(mouse);
 
         MyKeyboardAdapter keyboard = new MyKeyboardAdapter(this);
         setFocusable(true);
