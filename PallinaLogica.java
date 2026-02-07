@@ -9,6 +9,8 @@ public class PallinaLogica implements Runnable {
     private double limiteX, limiteY;
     private boolean attiva = false; // La pallina parte "ferma"
 
+    private MyPanel pannello;
+
     // Metodo per attivare il movimento
     public void setAttiva(boolean attiva) {
         this.attiva = attiva;
@@ -16,13 +18,15 @@ public class PallinaLogica implements Runnable {
 
     @Override
     public void run() {
-        while (true) {
-            if (attiva) { // Muovi solo se attiva è true
+        while (true) { 
+            if (attiva && !pannello.isPausa() && pannello.isGiocoIniziato()) {
                 muovi();
             }
+
             try {
-                Thread.sleep(7);
+                Thread.sleep(8); 
             } catch (InterruptedException e) {
+                break;
             }
         }
     }
@@ -35,13 +39,14 @@ public class PallinaLogica implements Runnable {
      * @param limiteX larghezza dell'area di gioco
      * @param limiteY altezza dell'area di gioco
      */
-    public PallinaLogica(double x, double y, double raggio, double limiteX, double limiteY) {
+    public PallinaLogica(double x, double y, double raggio, double limiteX, double limiteY, MyPanel p) {
         this.posizione = new Punto(x, y);
         this.raggio = raggio;
         this.limiteX = limiteX;
         this.limiteY = limiteY;
         this.velX = 3.0;
         this.velY = -3.0;
+        this.pannello=p;
     }
 
     /**

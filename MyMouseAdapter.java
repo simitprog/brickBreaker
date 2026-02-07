@@ -1,6 +1,7 @@
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.Rectangle; // Importa Rectangle per gestire il bottone
+import java.awt.Rectangle;
+import java.awt.Point;
 
 public class MyMouseAdapter extends MouseAdapter {
 
@@ -12,35 +13,43 @@ public class MyMouseAdapter extends MouseAdapter {
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        // Se il gioco è in corso, muovi la racchetta
-        /*if (pannelloSuCuiLavorare.isGiocoIniziato() && !pannelloSuCuiLavorare.isGameOver() && !pannelloSuCuiLavorare.isVittoria()) {
-            giocatoreLogico g = pannelloSuCuiLavorare.getGiocatoreLogico();
-            if (g != null) {
-                double nuovaX = e.getX() - (g.getLarghezza() / 2);
-                g.getPosizione().setX(nuovaX);
-                pannelloSuCuiLavorare.repaint();
-            }
-        }*/
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
         pannelloSuCuiLavorare.requestFocusInWindow();
+        Point click = e.getPoint();
 
-        if (pannelloSuCuiLavorare.isGameOver()) {
-            Rectangle area = pannelloSuCuiLavorare.getAreaBottone();
-            if (area != null && area.contains(e.getPoint())) {
-                pannelloSuCuiLavorare.setBottonePremuto(true); 
-                pannelloSuCuiLavorare.repaint();
+        // 1. GESTIONE PAUSA (Bottone in basso a destra)
+        if (pannelloSuCuiLavorare.isGiocoIniziato() && 
+            !pannelloSuCuiLavorare.isGameOver() && 
+            !pannelloSuCuiLavorare.isVittoria()) {
+            
+            Rectangle areaPausa = pannelloSuCuiLavorare.getAreaBottonePausa();
+            if (areaPausa.contains(click)) {
+                pannelloSuCuiLavorare.setPausa(!pannelloSuCuiLavorare.isPausa());
+                return; // Esco così non triggero altri click sovrapposti
             }
         }
 
-        int margine = 20;
-        int dim = 40;
-        Rectangle areaVolume = new Rectangle(margine, pannelloSuCuiLavorare.getHeight() - dim - margine, dim, dim);
-
-        if (areaVolume.contains(e.getPoint())) {
+        // 2. GESTIONE VOLUME (In basso a sinistra)
+        // Definiamo l'area dell'icona volume (stesse coordinate del paintComponent)
+        int dimVol = 40;
+        int margVol = 10;
+        Rectangle areaVolume = new Rectangle(margVol, pannelloSuCuiLavorare.getHeight() - dimVol - margVol, dimVol, dimVol);
+        
+        if (areaVolume.contains(click)) {
             pannelloSuCuiLavorare.toggleMute();
+            return;
+        }
+
+        // 3. GESTIONE PLAY AGAIN (Solo in Game Over)
+        if (pannelloSuCuiLavorare.isGameOver()) {
+            Rectangle areaReset = pannelloSuCuiLavorare.getAreaBottone();
+            if (areaReset != null && areaReset.contains(click)) {
+                pannelloSuCuiLavorare.setBottonePremuto(true); 
+                pannelloSuCuiLavorare.repaint();
+            }
         }
     }
 
@@ -48,12 +57,9 @@ public class MyMouseAdapter extends MouseAdapter {
     public void mouseReleased(MouseEvent e) {
         if (pannelloSuCuiLavorare.isGameOver() && pannelloSuCuiLavorare.isBottonePremuto()) {
             Rectangle area = pannelloSuCuiLavorare.getAreaBottone();
-            
-            // Se rilascio il mouse dentro l'area del bottone, resetto il gioco
             if (area != null && area.contains(e.getPoint())) {
                 pannelloSuCuiLavorare.resetGioco();
             }
-            
             pannelloSuCuiLavorare.setBottonePremuto(false);
             pannelloSuCuiLavorare.repaint();
         }

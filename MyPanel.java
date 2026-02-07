@@ -39,13 +39,18 @@ class MyPanel extends JPanel {
     private Image imgVolumeOn = new ImageIcon("resources/volumeOn.png").getImage();
     private Image imgVolumeOff = new ImageIcon("resources/volumeOff.png").getImage();
 
+    private boolean isPausa = false;
+    private Image imgPausa = new ImageIcon("resources/pause.png").getImage();
+    private Image imgPlay = new ImageIcon("resources/play.png").getImage();
+    private Rectangle areaBottonePausa = new Rectangle(880, 630, 50, 50);
+
     // Giocatore
     public giocatoreLogico gl = new giocatoreLogico((larghezzaPannello - larghezzaPiattaforma) / 2, 630,
     larghezzaPiattaforma, altezzaPiattaforma, larghezzaPannello);
     public GiocatoreGrafico piattaforma = new GiocatoreGrafico(gl, Color.BLACK);
 
     // Pallina
-    public PallinaLogica pl = new PallinaLogica(500, 600, 10, larghezzaPannello, altezzaPannello);
+    public PallinaLogica pl = new PallinaLogica(500, 600, 10, larghezzaPannello, altezzaPannello, this);
     public PallinaGrafica palla = new PallinaGrafica(pl, Color.RED);
 
     public List<PallinaGrafica> listaPallineGrafiche= new ArrayList<>();
@@ -109,7 +114,7 @@ class MyPanel extends JPanel {
     }
 
     private void updateGame() {
-        if (gameOver || vittoria || !giocoIniziato)
+        if (gameOver || vittoria || !giocoIniziato || isPausa)
             return;
 
         gl.update();
@@ -178,7 +183,7 @@ class MyPanel extends JPanel {
 
     //metodo creato per aggiungere creare una nuova pallina
     public void aggiungiPallina(double x, double y){
-        PallinaLogica nuova= new PallinaLogica(x, y, 10,larghezzaPannello , altezzaPannello);
+        PallinaLogica nuova= new PallinaLogica(x, y, 10,larghezzaPannello , altezzaPannello, this);
         nuova.setAttiva(true);
         PallinaGrafica nuovaG=new PallinaGrafica(nuova, Color.RED);
         listaPallineLogiche.add(nuova);
@@ -194,14 +199,18 @@ class MyPanel extends JPanel {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
+        // 1. SFONDO
         if (sfondo != null) {
             g.drawImage(sfondo, 0, 0, larghezzaPannello, altezzaPannello, this);
         }
 
+        // 2. ELEMENTI DI GIOCO (Piattaforma, Palline, Blocchi, Bonus)
         piattaforma.disegna(g);
+
         for (PallinaGrafica pg : listaPallineGrafiche) {
-             pg.disegna(g);
+            pg.disegna(g);
         }
+
         for (BloccoGrafico b : listaBlocchi) {
             b.disegna(g);
         }
@@ -210,58 +219,79 @@ class MyPanel extends JPanel {
             bo.disegna(g);
         }
 
-        // Overlay INIZIO GIOCO
+        // 3. INTERFACCIA UI (Bottoni sempre visibili durante il gioco)
+        if (giocoIniziato && !gameOver && !vittoria) {
+            
+            // --- BOTTONE PAUSA/PLAY (In basso a destra) ---
+            // Sceglie l'immagine in base allo stato attuale
+            Image immaginePausaCorrente = isPausa ? imgPlay : imgPausa;
+            
+            if (immaginePausaCorrente != null) {
+                g.drawImage(immaginePausaCorrente, areaBottonePausa.x, areaBottonePausa.y, 
+                            areaBottonePausa.width, areaBottonePausa.height, this);
+            } else {
+                // Emergenza: se le immagini non caricano, disegna un cerchio colorato
+                g.setColor(isPausa ? Color.GREEN : Color.RED);
+                g.fillOval(areaBottonePausa.x, areaBottonePausa.y, areaBottonePausa.width, areaBottonePausa.height);
+            }
+
+            // --- ICONA VOLUME (In basso a sinistra) ---
+            Image iconaVolume = isMuted ? imgVolumeOff : imgVolumeOn;
+            if (iconaVolume != null) {
+                int dimensioneIcona = 35;
+                int margine = 10;
+                int xIcona = margine;
+                int yIcona = altezzaPannello - dimensioneIcona - margine;
+                g.drawImage(iconaVolume, xIcona, yIcona, dimensioneIcona, dimensioneIcona, this);
+            }
+        }
+
+        // 4. OVERLAY DI STATO (Messaggi a tutto schermo)
+
+        // Messaggio Iniziale
         if (!giocoIniziato && !gameOver && !vittoria) {
             disegnaMessaggioCentrale(g, "PREMI INVIO PER GIOCARE", Color.WHITE);
         }
 
-        // overlay di vittoria
+        // Schermata di Pausa (Oscura tutto e scrive PAUSA)
+        if (isPausa && !gameOver && !vittoria) {
+            g.setColor(new Color(0, 0, 0, 150)); // Nero semitrasparente
+            g.fillRect(0, 0, larghezzaPannello, altezzaPannello);
+            disegnaMessaggioCentrale(g, "PAUSA", Color.YELLOW);
+        }
+
+        // Schermata Vittoria
         if (vittoria) {
-            g.setColor(new Color(0, 0, 0, 150));
+            g.setColor(new Color(0, 0, 0, 180));
             g.fillRect(0, 0, larghezzaPannello, altezzaPannello);
             disegnaMessaggioCentrale(g, "VITTORIA!", Color.GREEN);
-
+            
             g.setFont(new Font("Verdana", Font.PLAIN, 20));
             g.setColor(Color.WHITE);
-            g.drawString("Premi 'R' per ricominciare", (larghezzaPannello / 2) - 130, (altezzaPannello / 2) + 50);
+            g.drawString("Premi 'R' per ricominciare", (larghezzaPannello / 2) - 130, (altezzaPannello / 2) + 60);
         }
 
-        // overlay di game over
+        // Schermata Game Over
         if (gameOver) {
-            //oscuriamo lo schermo
-            g.setColor(new Color(0, 0, 0, 150));
-            g.fillRect(0, 0, larghezzaPannello, altezzaPannello);
-
-            //disegniamo l'immagine di Game Over al centro
+            // Disegna sfondo Game Over
             if (immagineGameOver != null) {
-                int imgLargh = larghezzaPannello;
-                int imgAlt = altezzaPannello;
-                
-                g.drawImage(immagineGameOver, 0, 0, imgLargh, imgAlt, this);
+                g.drawImage(immagineGameOver, 0, 0, larghezzaPannello, altezzaPannello, this);
+            } else {
+                g.setColor(new Color(0, 0, 0, 200));
+                g.fillRect(0, 0, larghezzaPannello, altezzaPannello);
             }
 
-            //scrivo il testo
             disegnaMessaggioCentrale(g, "GAME OVER", Color.RED);
 
-            Image imgCorrente = bottonePremuto ? imgBottonePressed : imgBottoneNormal;
-                    
-            //centro il bottone orizzontalmente
+            // Disegna Bottone Play Again
+            Image imgCorrenteReset = bottonePremuto ? imgBottonePressed : imgBottoneNormal;
             areaBottone.x = (larghezzaPannello - areaBottone.width) / 2;
             areaBottone.y = (altezzaPannello / 2) + 100;
-            g.drawImage(imgCorrente, areaBottone.x, areaBottone.y, areaBottone.width, areaBottone.height, this);
+            
+            if (imgCorrenteReset != null) {
+                g.drawImage(imgCorrenteReset, areaBottone.x, areaBottone.y, areaBottone.width, areaBottone.height, this);
+            }
         }
-
-        Image iconaVolume = isMuted ? imgVolumeOff : imgVolumeOn;
-        if (iconaVolume != null) {
-            int dimensioneIcona = 35;
-            int margine = 10;
-            // Posizionamento in basso a sinistra
-            int xIcona = margine;
-            int yIcona = altezzaPannello - dimensioneIcona - margine;
-
-            g.drawImage(iconaVolume, xIcona, yIcona, dimensioneIcona, dimensioneIcona, this);
-        }
-
     }
 
     private void disegnaMessaggioCentrale(Graphics g, String testo, Color colore) {
@@ -420,6 +450,28 @@ class MyPanel extends JPanel {
         }
 
         repaint();
+    }
+
+    public void setPausa(boolean pausa) {
+        this.isPausa = pausa;
+        
+        if (backgroundMusic != null) {
+            if (isPausa) {
+                backgroundMusic.stop();
+            } else if (giocoIniziato) {
+                backgroundMusic.start();
+                backgroundMusic.loop(Clip.LOOP_CONTINUOUSLY);
+            }
+        }
+        repaint();
+    }
+
+    public boolean isPausa() {
+        return isPausa;
+    }
+
+    public Rectangle getAreaBottonePausa() {
+        return areaBottonePausa;
     }
 
 }

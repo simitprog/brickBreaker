@@ -17,28 +17,37 @@ public class MyKeyboardAdapter extends KeyAdapter {
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
 
-        //avvio partita
+        // 1. Avvio partita
         if (key == KeyEvent.VK_ENTER) {
             pannelloSuCuiLavorare.iniziaPartita();
         }
 
-        //reset del gioco
+        // 2. Reset del gioco
         if (key == KeyEvent.VK_R) {
             pannelloSuCuiLavorare.resetGioco();
         }
 
-        //per la musica
+        // 3. Controlli Musica
         if (key == KeyEvent.VK_H) {
             pannelloSuCuiLavorare.prossimaCanzone();
         }
-
         if (key == KeyEvent.VK_M) {
             pannelloSuCuiLavorare.toggleMute();
         }
 
-        //movimento racchetta
+        // 4. Gestione PAUSA (Corretto l'errore della variabile 'p' in 'pannelloSuCuiLavorare')
+        if (key == KeyEvent.VK_ESCAPE || key == KeyEvent.VK_P) {
+            if (pannelloSuCuiLavorare.isGiocoIniziato() && 
+                !pannelloSuCuiLavorare.isGameOver() && 
+                !pannelloSuCuiLavorare.isVittoria()) {
+                
+                pannelloSuCuiLavorare.setPausa(!pannelloSuCuiLavorare.isPausa());
+            }
+        }
+
+        // 5. Movimento racchetta (Aggiunto controllo !isPausa)
         giocatoreLogico g = pannelloSuCuiLavorare.getGiocatoreLogico();
-        if (g != null && !pannelloSuCuiLavorare.isGameOver()) {
+        if (g != null && !pannelloSuCuiLavorare.isGameOver() && !pannelloSuCuiLavorare.isPausa()) {
             if (key == KeyEvent.VK_A || key == KeyEvent.VK_LEFT) g.muoviSinistra();
             if (key == KeyEvent.VK_D || key == KeyEvent.VK_RIGHT) g.muoviDestra();
         }
