@@ -1,10 +1,7 @@
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.Rectangle; // Importa Rectangle per gestire il bottone
 
-/**
- * @class MyMouseAdapter
- * @brief Gestisce il movimento della racchetta tramite mouse
- */
 public class MyMouseAdapter extends MouseAdapter {
 
     private MyPanel pannelloSuCuiLavorare;
@@ -15,15 +12,12 @@ public class MyMouseAdapter extends MouseAdapter {
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        if (pannelloSuCuiLavorare.isGiocoIniziato() && !pannelloSuCuiLavorare.isGameOver()) {
-            
+        // Se il gioco è in corso, muovi la racchetta
+        if (pannelloSuCuiLavorare.isGiocoIniziato() && !pannelloSuCuiLavorare.isGameOver() && !pannelloSuCuiLavorare.isVittoria()) {
             giocatoreLogico g = pannelloSuCuiLavorare.getGiocatoreLogico();
-            
             if (g != null) {
                 double nuovaX = e.getX() - (g.getLarghezza() / 2);
-                
                 g.getPosizione().setX(nuovaX);
-                
                 pannelloSuCuiLavorare.repaint();
             }
         }
@@ -31,7 +25,30 @@ public class MyMouseAdapter extends MouseAdapter {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        // Cliccando sul pannello forziamo il focus (utile per la tastiera)
         pannelloSuCuiLavorare.requestFocusInWindow();
+
+        // LOGICA BOTTONE GAME OVER
+        if (pannelloSuCuiLavorare.isGameOver()) {
+            Rectangle area = pannelloSuCuiLavorare.getAreaBottone(); // Creeremo questo metodo in MyPanel
+            if (area != null && area.contains(e.getPoint())) {
+                pannelloSuCuiLavorare.setBottonePremuto(true); // Per l'effetto grafico
+                pannelloSuCuiLavorare.repaint();
+            }
+        }
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        if (pannelloSuCuiLavorare.isGameOver() && pannelloSuCuiLavorare.isBottonePremuto()) {
+            Rectangle area = pannelloSuCuiLavorare.getAreaBottone();
+            
+            // Se rilascio il mouse dentro l'area del bottone, resetto il gioco
+            if (area != null && area.contains(e.getPoint())) {
+                pannelloSuCuiLavorare.resetGioco();
+            }
+            
+            pannelloSuCuiLavorare.setBottonePremuto(false);
+            pannelloSuCuiLavorare.repaint();
+        }
     }
 }

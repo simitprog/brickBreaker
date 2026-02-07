@@ -15,6 +15,7 @@ public class BonusLogico extends Thread{
         if(numerorandom==0){tipoBonus="Barralunga";}
         else if(numerorandom==1){tipoBonus="DuplicaPallina";}
         else{tipoBonus="VelocizzaBarra";}
+
         this.velocitaCaduta=velocitaCaduta;
         this.coordinate=new Punto(x, y);
         this.durataEffetto=durataEffetto;
@@ -78,15 +79,26 @@ public class BonusLogico extends Thread{
 
 
 
-    public void controllaCollisione(giocatoreLogico g){
+    public void controllaCollisione(giocatoreLogico g) {
+    double bonusX = coordinate.getX();
+    double bonusY = coordinate.getY();
+    int larghezzaBonus = 40;
+    int altezzaBonus = 40;
 
-       if(coordinate.getY()==g.getPosizione().getY()){
-         if(coordinate.getX()>=g.getPosizione().getX()||coordinate.getX()<=g.getLarghezza()){
-            preso=true;
+    //margini della barra
+    double barraXMin = g.getPosizione().getX();
+    double barraXMax = g.getPosizione().getX() + g.getLarghezza();
+    double barraY = g.getPosizione().getY();
+
+    //controllo collisione:
+    if (bonusY + altezzaBonus >= barraY && bonusY <= barraY + g.getAltezza()) {
+        
+        //la x del bonus deve essere compresa tra l'inizio e la fine della barra
+        if (bonusX + larghezzaBonus >= barraXMin && bonusX <= barraXMax) {
+            preso = true;
         }
-       }
-
     }
+}
 
        public String getTipoBonus() {
         return tipoBonus;

@@ -3,6 +3,9 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.io.InputStream;
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
 
 class MyPanel extends JPanel {
     private int larghezzaPannello = 1000;
@@ -14,6 +17,17 @@ class MyPanel extends JPanel {
     private boolean giocoIniziato = false;
     private boolean gameOver = false;
     private boolean vittoria = false;
+
+    private Font font;
+
+    private Image imgBottoneNormal = new ImageIcon("resources/button_play_again.png").getImage();
+    private Image imgBottonePressed = new ImageIcon("resources/button_pressed_play_again.png").getImage();
+    private boolean bottonePremuto = false;
+    private Rectangle areaBottone = new Rectangle(400, 450, 200, 60);
+
+    private Image imgBarraLunga = new ImageIcon("resources/bonus_allunga.png").getImage();
+    private Image imgDuplica = new ImageIcon("resources/bonus_duplica.png").getImage();
+    private Image imgVelocita = new ImageIcon("resources/bonus_velocita.png").getImage();
 
     // Giocatore
     public giocatoreLogico gl = new giocatoreLogico((larghezzaPannello - larghezzaPiattaforma) / 2, 630,
@@ -33,6 +47,7 @@ class MyPanel extends JPanel {
     private List<BonusGrafico> listaBonus = new ArrayList<>();
     private Image sfondo;
     private Image immagineBonus = new ImageIcon("resources/IconBonus.jpg").getImage();
+    private Image immagineGameOver = new ImageIcon("resources/game_over_panel.png").getImage();
 
     public MyPanel() {
         int nRighe = 6;
@@ -56,6 +71,15 @@ class MyPanel extends JPanel {
 
         sfondo = new ImageIcon("resources/bg1.png").getImage(); //c'e' n'e' un altro nelle resources, pero' questo fa vedere meglio la pallina
 
+        try {
+            // Sostituisci "nome_tuo_font.ttf" con il nome esatto del file
+            InputStream is = new BufferedInputStream(new FileInputStream("resources/font.ttf"));
+            font = Font.createFont(Font.TRUETYPE_FONT, is);
+        } catch (Exception e) {
+            System.out.println("Errore caricamento font, uso Verdana");
+            font = new Font("Verdana", Font.BOLD, 40);
+        }
+
         Thread threadPalla = new Thread(pl);
         threadPalla.start();
 
@@ -65,9 +89,9 @@ class MyPanel extends JPanel {
         });
         gameLoop.start();
 
-        //MyMouseAdapter mouse = new MyMouseAdapter(this);
-        //addMouseListener(mouse);
-        //addMouseMotionListener(mouse);
+        MyMouseAdapter mouse = new MyMouseAdapter(this);
+        addMouseListener(mouse);
+        addMouseMotionListener(mouse);
 
         MyKeyboardAdapter keyboard = new MyKeyboardAdapter(this);
         setFocusable(true);
@@ -111,8 +135,20 @@ class MyPanel extends JPanel {
             if (Math.random() < 0.20) {
                 int bx = (int) b.getLogico().posizione.getX();
                 int by = (int) b.getLogico().posizione.getY();
+                
                 BonusLogico boL = new BonusLogico(bx, by, 40, 10000, this);
-                BonusGrafico boG = new BonusGrafico(boL, immagineBonus, this);
+                
+                Image immagineDaUsare;
+                if (boL.getTipoBonus().equals("Barralunga")) {
+                    immagineDaUsare = imgBarraLunga;
+                } else if (boL.getTipoBonus().equals("DuplicaPallina")) {
+                    immagineDaUsare = imgDuplica;
+                } else {
+                    immagineDaUsare = imgVelocita;
+                }
+
+                BonusGrafico boG = new BonusGrafico(boL, immagineDaUsare, this);
+                
                 listaBonus.add(boG);
                 new Thread(boL).start();
             }
@@ -187,24 +223,43 @@ class MyPanel extends JPanel {
 
         // overlay di game over
         if (gameOver) {
+            //oscuriamo lo schermo
             g.setColor(new Color(0, 0, 0, 150));
             g.fillRect(0, 0, larghezzaPannello, altezzaPannello);
+
+            //disegniamo l'immagine di Game Over al centro
+            if (immagineGameOver != null) {
+                int imgLargh = larghezzaPannello;
+                int imgAlt = altezzaPannello;
+                
+                g.drawImage(immagineGameOver, 0, 0, imgLargh, imgAlt, this);
+            }
+
+            //scrivo il testo
             disegnaMessaggioCentrale(g, "GAME OVER", Color.RED);
 
-            g.setFont(new Font("Verdana", Font.PLAIN, 20));
-            g.setColor(Color.WHITE);
-            g.drawString("Premi 'R' per ricominciare", (larghezzaPannello / 2) - 130, (altezzaPannello / 2) + 50);
+            Image imgCorrente = bottonePremuto ? imgBottonePressed : imgBottoneNormal;
+                    
+            //centro il bottone orizzontalmente
+            areaBottone.x = (larghezzaPannello - areaBottone.width) / 2;
+            areaBottone.y = (altezzaPannello / 2) + 100;
+            g.drawImage(imgCorrente, areaBottone.x, areaBottone.y, areaBottone.width, areaBottone.height, this);
         }
     }
 
     private void disegnaMessaggioCentrale(Graphics g, String testo, Color colore) {
-        g.setFont(new Font("Verdana", Font.BOLD, 40));
+        // .deriveFont(float size) cambia la dimensione del font caricato
+        g.setFont(font.deriveFont(70f)); 
+        
         FontMetrics fm = g.getFontMetrics();
         int x = (larghezzaPannello - fm.stringWidth(testo)) / 2;
         int y = altezzaPannello / 2;
 
+        // Ombra
         g.setColor(Color.BLACK);
         g.drawString(testo, x + 3, y + 3);
+        
+        // Testo principale
         g.setColor(colore);
         g.drawString(testo, x, y);
     }
@@ -244,6 +299,10 @@ class MyPanel extends JPanel {
     public boolean isGiocoIniziato() {
         return giocoIniziato;
     }
+
+    public Rectangle getAreaBottone() { return areaBottone; }
+    public boolean isBottonePremuto() { return bottonePremuto; }
+    public void setBottonePremuto(boolean stato) { this.bottonePremuto = stato; }
 
     public void resetGioco() {
         this.gameOver = false;
