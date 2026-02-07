@@ -6,7 +6,7 @@ public class PallinaLogica implements Runnable {
     private Punto posizione;
     private double raggio;
     private double velX, velY;
-    private double limiteX, limiteY;
+    private double limiteX;
     private boolean attiva = false; // La pallina parte "ferma"
 
     private MyPanel pannello;
@@ -39,11 +39,10 @@ public class PallinaLogica implements Runnable {
      * @param limiteX larghezza dell'area di gioco
      * @param limiteY altezza dell'area di gioco
      */
-    public PallinaLogica(double x, double y, double raggio, double limiteX, double limiteY, MyPanel p) {
+    public PallinaLogica(double x, double y, double raggio, double limiteX, MyPanel p) {
         this.posizione = new Punto(x, y);
         this.raggio = raggio;
         this.limiteX = limiteX;
-        this.limiteY = limiteY;
         this.velX = 3.0;
         this.velY = -3.0;
         this.pannello=p;

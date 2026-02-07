@@ -1,6 +1,5 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.io.InputStream;
@@ -51,7 +50,7 @@ class MyPanel extends JPanel {
     public GiocatoreGrafico piattaforma = new GiocatoreGrafico(gl, Color.BLACK);
 
     // Pallina
-    public PallinaLogica pl = new PallinaLogica(500, 600, 10, larghezzaPannello, altezzaPannello, this);
+    public PallinaLogica pl = new PallinaLogica(500, 600, 10, larghezzaPannello, this);
     public PallinaGrafica palla = new PallinaGrafica(pl, Color.RED);
 
     public List<PallinaGrafica> listaPallineGrafiche= new ArrayList<>();
@@ -188,7 +187,7 @@ class MyPanel extends JPanel {
 
     //metodo creato per aggiungere creare una nuova pallina
     public void aggiungiPallina(double x, double y){
-        PallinaLogica nuova= new PallinaLogica(x, y, 10,larghezzaPannello , altezzaPannello, this);
+        PallinaLogica nuova= new PallinaLogica(x, y, 10,larghezzaPannello, this);
         nuova.setAttiva(true);
         PallinaGrafica nuovaG=new PallinaGrafica(nuova, Color.RED);
         listaPallineLogiche.add(nuova);
@@ -249,7 +248,7 @@ class MyPanel extends JPanel {
 
         // Messaggio Iniziale
         if (!giocoIniziato && !gameOver && !vittoria) {
-            disegnaMessaggioCentrale(g, "PREMI INVIO PER GIOCARE", Color.WHITE);
+            disegnaMessaggioCentrale(g, "PREMI INVIO PER GIOCARE", Color.WHITE,70);
         }
 
         // Schermata di Pausa (Oscura tutto e scrive PAUSA)
@@ -259,7 +258,7 @@ class MyPanel extends JPanel {
             g.fillRect(0, 0, larghezzaPannello, altezzaPannello);
 
             // 2. Scritta PAUSA
-            disegnaMessaggioPausa(g, "PAUSA", Color.YELLOW);
+            disegnaMessaggioPausa(g, "PAUSA", Color.YELLOW, 100);
 
             // 3. Posizionamento dinamico del tasto Play
             // Calcoliamo il centro per farlo apparire sotto il messaggio
@@ -284,7 +283,7 @@ class MyPanel extends JPanel {
         if (vittoria) {
             g.setColor(new Color(0, 0, 0, 215));
             g.fillRect(0, 0, larghezzaPannello, altezzaPannello);
-            disegnaMessaggioCentrale(g, "VITTORIA!", Color.GREEN);
+            disegnaMessaggioCentrale(g, "VITTORIA!", Color.GREEN, 150);
             
             g.setFont(new Font("Verdana", Font.PLAIN, 20));
             g.setColor(Color.WHITE);
@@ -303,7 +302,7 @@ class MyPanel extends JPanel {
                 g.fillRect(0, 0, larghezzaPannello, altezzaPannello);
             }
 
-            disegnaMessaggioCentrale(g, "GAME OVER", Color.RED);
+            disegnaMessaggioCentrale(g, "GAME OVER", Color.RED, 150);
 
             // Disegna Bottone Play Again
             Image imgCorrenteReset = bottonePremuto ? imgBottonePressed : imgBottoneNormal;
@@ -316,9 +315,9 @@ class MyPanel extends JPanel {
         }
     }
 
-    private void disegnaMessaggioCentrale(Graphics g, String testo, Color colore) {
+    private void disegnaMessaggioCentrale(Graphics g, String testo, Color colore, int dimensione) {
         // .deriveFont(float size) cambia la dimensione del font caricato
-        g.setFont(font.deriveFont(70f)); 
+        g.setFont(font.deriveFont((float)dimensione)); 
         
         FontMetrics fm = g.getFontMetrics();
         int x = (larghezzaPannello - fm.stringWidth(testo)) / 2;
@@ -333,13 +332,13 @@ class MyPanel extends JPanel {
         g.drawString(testo, x, y);
     }
 
-    private void disegnaMessaggioPausa(Graphics g, String testo, Color colore) {
+    private void disegnaMessaggioPausa(Graphics g, String testo, Color colore, int dimensione) {
         // .deriveFont(float size) cambia la dimensione del font caricato
-        g.setFont(font.deriveFont(70f)); 
+        g.setFont(font.deriveFont((float)dimensione)); 
         
         FontMetrics fm = g.getFontMetrics();
         int x = (larghezzaPannello - fm.stringWidth(testo)) / 2;
-        int y = altezzaPannello / 2 - 100;
+        int y = altezzaPannello / 2 - 50;
 
         // Ombra
         g.setColor(Color.BLACK);
