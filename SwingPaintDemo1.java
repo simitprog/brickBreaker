@@ -19,6 +19,7 @@ public class SwingPaintDemo1 {
         JFrame f = new JFrame("BrickBreaker67");
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.setSize(1000,700);
+        f.setResizable(false);
         MyPanel p = new MyPanel();
         f.add(p);
         f.pack();

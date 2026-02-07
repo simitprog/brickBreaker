@@ -6,6 +6,8 @@ import java.util.List;
 import java.io.InputStream;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
+import javax.sound.sampled.*;
+import java.io.File;
 
 class MyPanel extends JPanel {
     private int larghezzaPannello = 1000;
@@ -29,6 +31,11 @@ class MyPanel extends JPanel {
     private Image imgDuplica = new ImageIcon("resources/bonus_duplica.png").getImage();
     private Image imgVelocita = new ImageIcon("resources/bonus_velocita.png").getImage();
 
+    private String[] playlist = {"inTheEnd_LP.wav", "decode_Paramore.wav", "spiders_SOAD.wav", "MyWay_LB.wav", "byTheWay_RHCP.wav"}; // Aggiungi i tuoi nomi reali
+    private int indiceMusica = 0;
+    private Clip backgroundMusic;
+    private boolean isMuted = false;
+
     // Giocatore
     public giocatoreLogico gl = new giocatoreLogico((larghezzaPannello - larghezzaPiattaforma) / 2, 630,
     larghezzaPiattaforma, altezzaPiattaforma, larghezzaPannello);
@@ -46,7 +53,6 @@ class MyPanel extends JPanel {
     private List<BloccoGrafico> listaBlocchi = new ArrayList<>();
     private List<BonusGrafico> listaBonus = new ArrayList<>();
     private Image sfondo;
-    private Image immagineBonus = new ImageIcon("resources/IconBonus.jpg").getImage();
     private Image immagineGameOver = new ImageIcon("resources/game_over_panel.png").getImage();
 
     public MyPanel() {
@@ -273,6 +279,13 @@ class MyPanel extends JPanel {
             this.giocoIniziato = true;
             this.pl.setAttiva(true);
         }
+
+        if (backgroundMusic == null) {
+            playSoundtrack("inTheEnd_LP.wav");
+        }
+        
+        this.giocoIniziato = true;
+        this.pl.setAttiva(true);
     }
 
     public void rimuoviBonus(BonusLogico logico) {
@@ -338,4 +351,62 @@ class MyPanel extends JPanel {
         repaint();
         requestFocusInWindow();
     }
+
+    public void playSoundtrack(String filename) {
+        try {
+            // 1. FERMA E CHIUDI la musica precedente se esiste
+            if (backgroundMusic != null) {
+                backgroundMusic.stop();  // Ferma la riproduzione
+                backgroundMusic.flush(); // Svuota il buffer dei dati
+                backgroundMusic.close(); // Rilascia le risorse di sistema
+            }
+
+            // 2. Carica il nuovo file
+            File soundFile = new File("resources/soundtracks/" + filename);
+            AudioInputStream audioStream = AudioSystem.getAudioInputStream(soundFile);
+            
+            // 3. Crea il nuovo clip
+            backgroundMusic = AudioSystem.getClip();
+            backgroundMusic.open(audioStream);
+            
+            // 4. Avvia il loop
+            backgroundMusic.loop(Clip.LOOP_CONTINUOUSLY);
+            backgroundMusic.start();
+            
+        } catch (Exception e) {
+            System.out.println("Errore audio: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public void stopSoundtrack() {
+        if (backgroundMusic != null && backgroundMusic.isRunning()) {
+            backgroundMusic.stop();
+        }
+    }
+
+    public void prossimaCanzone() {
+        indiceMusica = (indiceMusica + 1) % playlist.length;
+        playSoundtrack(playlist[indiceMusica]);
+    }
+
+    public void toggleMute() {
+        if (backgroundMusic == null) return;
+
+        // Otteniamo il controllo del volume del clip
+        FloatControl gainControl = (FloatControl) backgroundMusic.getControl(FloatControl.Type.MASTER_GAIN);
+        
+        if (!isMuted) {
+            // Mettiamo il volume al minimo possibile (silenzio assoluto)
+            gainControl.setValue(gainControl.getMinimum());
+            isMuted = true;
+            System.out.println("Audio OFF");
+        } else {
+            // Riportiamo il volume a 0.0 decibel (volume standard del file)
+            gainControl.setValue(0.0f);
+            isMuted = false;
+            System.out.println("Audio ON");
+        }
+    }
+
 }

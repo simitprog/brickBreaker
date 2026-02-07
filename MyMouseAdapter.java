@@ -13,25 +13,24 @@ public class MyMouseAdapter extends MouseAdapter {
     @Override
     public void mouseMoved(MouseEvent e) {
         // Se il gioco è in corso, muovi la racchetta
-        if (pannelloSuCuiLavorare.isGiocoIniziato() && !pannelloSuCuiLavorare.isGameOver() && !pannelloSuCuiLavorare.isVittoria()) {
+        /*if (pannelloSuCuiLavorare.isGiocoIniziato() && !pannelloSuCuiLavorare.isGameOver() && !pannelloSuCuiLavorare.isVittoria()) {
             giocatoreLogico g = pannelloSuCuiLavorare.getGiocatoreLogico();
             if (g != null) {
                 double nuovaX = e.getX() - (g.getLarghezza() / 2);
                 g.getPosizione().setX(nuovaX);
                 pannelloSuCuiLavorare.repaint();
             }
-        }
+        }*/
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
         pannelloSuCuiLavorare.requestFocusInWindow();
 
-        // LOGICA BOTTONE GAME OVER
         if (pannelloSuCuiLavorare.isGameOver()) {
-            Rectangle area = pannelloSuCuiLavorare.getAreaBottone(); // Creeremo questo metodo in MyPanel
+            Rectangle area = pannelloSuCuiLavorare.getAreaBottone();
             if (area != null && area.contains(e.getPoint())) {
-                pannelloSuCuiLavorare.setBottonePremuto(true); // Per l'effetto grafico
+                pannelloSuCuiLavorare.setBottonePremuto(true); 
                 pannelloSuCuiLavorare.repaint();
             }
         }
