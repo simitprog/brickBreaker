@@ -20,7 +20,7 @@ public class MyMouseAdapter extends MouseAdapter {
         pannelloSuCuiLavorare.requestFocusInWindow();
         Point click = e.getPoint();
 
-        // 1. GESTIONE PAUSA ATTIVA (Bottone centrale Play)
+        //pausa attiva
         if (pannelloSuCuiLavorare.isPausa() && !pannelloSuCuiLavorare.isGameOver() && !pannelloSuCuiLavorare.isVittoria()) {
             Rectangle areaPlayCentrale = pannelloSuCuiLavorare.getAreaBottonePlay();
             if (areaPlayCentrale != null && areaPlayCentrale.contains(click)) {
@@ -29,7 +29,7 @@ public class MyMouseAdapter extends MouseAdapter {
             }
         }
 
-        // 2. GESTIONE TASTO PAUSA STANDARD (In basso a destra, solo se NON è già in pausa)
+        //pausa non attiva
         if (pannelloSuCuiLavorare.isGiocoIniziato() && 
             !pannelloSuCuiLavorare.isGameOver() && 
             !pannelloSuCuiLavorare.isVittoria() &&
@@ -42,7 +42,7 @@ public class MyMouseAdapter extends MouseAdapter {
             }
         }
 
-        // 3. GESTIONE VOLUME (In basso a sinistra)
+        //volume
         int dimVol = 40;
         int margVol = 10;
         Rectangle areaVolume = new Rectangle(margVol, pannelloSuCuiLavorare.getHeight() - dimVol - margVol, dimVol, dimVol);
@@ -52,12 +52,25 @@ public class MyMouseAdapter extends MouseAdapter {
             return;
         }
 
-        // 4. GESTIONE PLAY AGAIN (Solo in Game Over)
+        //play again
         if (pannelloSuCuiLavorare.isGameOver()) {
             Rectangle areaReset = pannelloSuCuiLavorare.getAreaBottone();
             if (areaReset != null && areaReset.contains(click)) {
                 pannelloSuCuiLavorare.setBottonePremuto(true); 
                 pannelloSuCuiLavorare.repaint();
+            }
+        }
+
+        //schermata home
+        if (!pannelloSuCuiLavorare.isGiocoIniziato() && 
+            !pannelloSuCuiLavorare.isGameOver() && 
+            !pannelloSuCuiLavorare.isVittoria()) {
+            
+            Rectangle areaHome = pannelloSuCuiLavorare.getAreaBottoneHome();
+            if (areaHome.contains(click)) {
+                pannelloSuCuiLavorare.iniziaPartita();
+                pannelloSuCuiLavorare.repaint();
+                return;
             }
         }
     }

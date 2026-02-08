@@ -63,6 +63,9 @@ class MyPanel extends JPanel {
     private Image sfondo;
     private Image immagineGameOver = new ImageIcon("resources/game_over_panel.png").getImage();
 
+    private Rectangle areaBottoneHome = new Rectangle(0, 0, 200, 60);
+    private Image imgGioca = new ImageIcon("resources/button_gioca.png").getImage(); // Opzionale
+
     public boolean getCanReload(){
         return gameOver || vittoria;
     }
@@ -209,6 +212,7 @@ class MyPanel extends JPanel {
         }
 
         // 2. ELEMENTI DI GIOCO (Piattaforma, Palline, Blocchi, Bonus)
+        // Li disegniamo sempre, ma saranno coperti dall'overlay se il gioco non è iniziato
         piattaforma.disegna(g);
 
         for (PallinaGrafica pg : listaPallineGrafiche) {
@@ -223,17 +227,16 @@ class MyPanel extends JPanel {
             bo.disegna(g);
         }
 
-        // 3. INTERFACCIA UI (Bottoni sempre visibili durante il gioco)
+        // 3. INTERFACCIA UI (Bottoni visibili solo DURANTE il gioco)
         if (giocoIniziato && !gameOver && !vittoria) {
             
-            // --- BOTTONE PAUSA
-            
+            // --- BOTTONE PAUSA (Scompare se è già in pausa)
             if (!isPausa()) {
                 g.drawImage(imgPausa, areaBottonePausa.x, areaBottonePausa.y, 
                             areaBottonePausa.width, areaBottonePausa.height, this);
             }
 
-            // --- ICONA VOLUME (In basso a sinistra) ---
+            // --- ICONA VOLUME
             Image iconaVolume = isMuted ? imgVolumeOff : imgVolumeOn;
             if (iconaVolume != null) {
                 int dimensioneIcona = 35;
@@ -244,42 +247,60 @@ class MyPanel extends JPanel {
             }
         }
 
-        // 4. OVERLAY DI STATO (Messaggi a tutto schermo)
+        // 4. OVERLAY DI STATO
 
-        // Messaggio Iniziale
+        // --- SCHERMATA HOME (Nuova!) ---
         if (!giocoIniziato && !gameOver && !vittoria) {
-            disegnaMessaggioCentrale(g, "PREMI INVIO PER GIOCARE", Color.WHITE,70);
+            // Oscuriamo lo sfondo per far risaltare la Home
+            g.setColor(new Color(0, 0, 0, 180));
+            g.fillRect(0, 0, larghezzaPannello, altezzaPannello);
+
+            // Titolo del Gioco
+            disegnaMessaggioCentrale(g, "BRICK BREAKER", Color.CYAN, 100);
+
+            // Disegno Bottone "GIOCA"
+            int larghezzaB = 200;
+            int altezzaB = 60;
+            areaBottoneHome.x = (larghezzaPannello - larghezzaB) / 2;
+            areaBottoneHome.y = (altezzaPannello / 2) + 50;
+            areaBottoneHome.width = larghezzaB;
+            areaBottoneHome.height = altezzaB;
+
+            if (imgGioca != null) {
+                g.drawImage(imgGioca, areaBottoneHome.x, areaBottoneHome.y, areaBottoneHome.width, areaBottoneHome.height, this);
+            } else {
+                // Se non hai l'immagine, disegna un bottone stilizzato
+                g.setColor(Color.WHITE);
+                g.fillRoundRect(areaBottoneHome.x, areaBottoneHome.y, areaBottoneHome.width, areaBottoneHome.height, 20, 20);
+                g.setColor(Color.BLACK);
+                g.setFont(new Font("Arial", Font.BOLD, 25));
+                g.drawString("GIOCA", areaBottoneHome.x + 55, areaBottoneHome.y + 40);
+            }
         }
 
-        // Schermata di Pausa (Oscura tutto e scrive PAUSA)
+        // --- SCHERMATA DI PAUSA ---
         if (isPausa && !gameOver && !vittoria) {
-            // 1. Sfondo oscurato
             g.setColor(new Color(0, 0, 0, 215)); 
             g.fillRect(0, 0, larghezzaPannello, altezzaPannello);
 
-            // 2. Scritta PAUSA
             disegnaMessaggioPausa(g, "PAUSA", Color.YELLOW, 100);
 
-            // 3. Posizionamento dinamico del tasto Play
-            // Calcoliamo il centro per farlo apparire sotto il messaggio
             int dimensionePlay = 80;
             areaBottonePlay.x = (larghezzaPannello - dimensionePlay) / 2;
-            areaBottonePlay.y = (altezzaPannello / 2) + 60; // 60 pixel sotto la scritta centrale
+            areaBottonePlay.y = (altezzaPannello / 2) + 60;
             areaBottonePlay.width = dimensionePlay;
             areaBottonePlay.height = dimensionePlay;
 
-            // 4. Disegno dell'immagine Play
             if (imgPlay != null) {
                 g.drawImage(imgPlay, areaBottonePlay.x, areaBottonePlay.y, 
                             areaBottonePlay.width, areaBottonePlay.height, this);
             } else {
-                // Piano B: se l'immagine manca, disegna un triangolo o un cerchio verde
                 g.setColor(Color.GREEN);
                 g.fillOval(areaBottonePlay.x, areaBottonePlay.y, dimensionePlay, dimensionePlay);
             }
         }
 
-        // Schermata Vittoria
+        // --- SCHERMATA VITTORIA ---
         if (vittoria) {
             g.setColor(new Color(0, 0, 0, 215));
             g.fillRect(0, 0, larghezzaPannello, altezzaPannello);
@@ -287,24 +308,20 @@ class MyPanel extends JPanel {
             
             g.setFont(new Font("Verdana", Font.PLAIN, 20));
             g.setColor(Color.WHITE);
-            g.drawString("Premi 'R' per ricominciare", (larghezzaPannello / 2) - 130, (altezzaPannello / 2) + 60);
+            g.drawString("Premi 'R' per ricominciare", (larghezzaPannello / 2) - 130, (altezzaPannello / 2) + 120);
         }
 
-        // Schermata Game Over
+        // --- SCHERMATA GAME OVER ---
         if (gameOver) {
-            // Disegna sfondo Game Over
+            g.setColor(new Color(0, 0, 0, 215));
+            g.fillRect(0, 0, larghezzaPannello, altezzaPannello);
+
             if (immagineGameOver != null) {
-                g.setColor(new Color(0, 0, 0, 215));
-                g.fillRect(0, 0, larghezzaPannello, altezzaPannello);
                 g.drawImage(immagineGameOver, 0, 0, larghezzaPannello, altezzaPannello, this);
-            } else {
-                g.setColor(new Color(0, 0, 0, 215));
-                g.fillRect(0, 0, larghezzaPannello, altezzaPannello);
             }
 
             disegnaMessaggioCentrale(g, "GAME OVER", Color.RED, 150);
 
-            // Disegna Bottone Play Again
             Image imgCorrenteReset = bottonePremuto ? imgBottonePressed : imgBottoneNormal;
             areaBottone.x = (larghezzaPannello - areaBottone.width) / 2;
             areaBottone.y = (altezzaPannello / 2) + 100;
@@ -514,5 +531,9 @@ class MyPanel extends JPanel {
 
     public Rectangle getAreaBottonePlay() {
         return areaBottonePlay;
+    }
+
+    public Rectangle getAreaBottoneHome() {
+        return areaBottoneHome;
     }
 }
