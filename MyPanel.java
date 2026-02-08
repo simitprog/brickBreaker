@@ -73,7 +73,7 @@ class MyPanel extends JPanel {
 
         setBorder(BorderFactory.createLineBorder(Color.black));
 
-        double larghezzaBlocco = 142.85;
+        double larghezzaBlocco = 142.857;
         double altezzaBlocco = 25;
 
         // inizializzazione blocchi
