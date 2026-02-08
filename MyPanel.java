@@ -65,6 +65,10 @@ class MyPanel extends JPanel {
 
     private Rectangle areaBottoneHome = new Rectangle(0, 0, 200, 60);
     private Image imgGioca = new ImageIcon("resources/button_gioca.png").getImage(); // Opzionale
+    private Image imgComandi = new ImageIcon("resources/button_comandi.png").getImage();
+
+    private Rectangle areaBottoneComandi = new Rectangle(0, 0, 200, 60);
+    private boolean mostraComandi = false;
 
     public boolean getCanReload(){
         return gameOver || vittoria;
@@ -206,13 +210,13 @@ class MyPanel extends JPanel {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        // 1. SFONDO
+        //sfondo
         if (sfondo != null) {
             g.drawImage(sfondo, 0, 0, larghezzaPannello, altezzaPannello, this);
         }
 
-        // 2. ELEMENTI DI GIOCO (Piattaforma, Palline, Blocchi, Bonus)
-        // Li disegniamo sempre, ma saranno coperti dall'overlay se il gioco non è iniziato
+        //elementi di gioco
+        //vengono disegnati sempre come "base", poi gli overlay decidono se coprirli
         piattaforma.disegna(g);
 
         for (PallinaGrafica pg : listaPallineGrafiche) {
@@ -227,63 +231,94 @@ class MyPanel extends JPanel {
             bo.disegna(g);
         }
 
-        // 3. INTERFACCIA UI (Bottoni visibili solo DURANTE il gioco)
-        if (giocoIniziato && !gameOver && !vittoria) {
+        //interfaccia ui
+        if (giocoIniziato && !gameOver && !vittoria && !isPausa) {
             
-            // --- BOTTONE PAUSA (Scompare se è già in pausa)
-            if (!isPausa()) {
+            //bottone pausa
+            if (imgPausa != null) {
                 g.drawImage(imgPausa, areaBottonePausa.x, areaBottonePausa.y, 
                             areaBottonePausa.width, areaBottonePausa.height, this);
             }
 
-            // --- ICONA VOLUME
+            //icona volume
             Image iconaVolume = isMuted ? imgVolumeOff : imgVolumeOn;
             if (iconaVolume != null) {
                 int dimensioneIcona = 35;
                 int margine = 10;
-                int xIcona = margine;
-                int yIcona = altezzaPannello - dimensioneIcona - margine;
-                g.drawImage(iconaVolume, xIcona, yIcona, dimensioneIcona, dimensioneIcona, this);
+                g.drawImage(iconaVolume, margine, altezzaPannello - dimensioneIcona - margine, 
+                            dimensioneIcona, dimensioneIcona, this);
             }
         }
 
-        // 4. OVERLAY DI STATO
+        //overlay di stato
 
-        // --- SCHERMATA HOME (Nuova!) ---
-        if (!giocoIniziato && !gameOver && !vittoria) {
-            // Oscuriamo lo sfondo per far risaltare la Home
+        //schermata home
+        if (!giocoIniziato && !gameOver && !vittoria && !mostraComandi) {
             g.setColor(new Color(0, 0, 0, 180));
             g.fillRect(0, 0, larghezzaPannello, altezzaPannello);
 
-            // Titolo del Gioco
             disegnaMessaggioCentrale(g, "BRICK BREAKER", Color.CYAN, 100);
 
-            // Disegno Bottone "GIOCA"
-            int larghezzaB = 200;
-            int altezzaB = 60;
-            areaBottoneHome.x = (larghezzaPannello - larghezzaB) / 2;
-            areaBottoneHome.y = (altezzaPannello / 2) + 50;
-            areaBottoneHome.width = larghezzaB;
-            areaBottoneHome.height = altezzaB;
+            //coordinate e dimensioni per entrambi i bottoni
+            int larghezzaB = 220;
+            int altezzaB = 70;
+            int xCentrale = (larghezzaPannello - larghezzaB) / 2;
 
-            if (imgGioca != null) {
+            //bottone gioca
+            areaBottoneHome.setBounds(xCentrale, (altezzaPannello / 2) + 20, larghezzaB, altezzaB);
+            if (imgGioca != null && imgGioca.getWidth(null) != -1) {
                 g.drawImage(imgGioca, areaBottoneHome.x, areaBottoneHome.y, areaBottoneHome.width, areaBottoneHome.height, this);
             } else {
-                // Se non hai l'immagine, disegna un bottone stilizzato
+                //se l'immagine e' mancante
                 g.setColor(Color.WHITE);
                 g.fillRoundRect(areaBottoneHome.x, areaBottoneHome.y, areaBottoneHome.width, areaBottoneHome.height, 20, 20);
                 g.setColor(Color.BLACK);
-                g.setFont(new Font("Arial", Font.BOLD, 25));
-                g.drawString("GIOCA", areaBottoneHome.x + 55, areaBottoneHome.y + 40);
+                g.drawString("GIOCA", areaBottoneHome.x + 60, areaBottoneHome.y + 45);
+            }
+
+            //disegno bottone comandi
+            areaBottoneComandi.setBounds(xCentrale, (altezzaPannello / 2) + 110, larghezzaB, altezzaB);
+            if (imgComandi != null && imgComandi.getWidth(null) != -1) {
+                g.drawImage(imgComandi, areaBottoneComandi.x, areaBottoneComandi.y, areaBottoneComandi.width, areaBottoneComandi.height, this);
+            } else {
+                //se l'immagine e' mancante
+                g.setColor(new Color(200, 200, 200));
+                g.fillRoundRect(areaBottoneComandi.x, areaBottoneComandi.y, areaBottoneComandi.width, areaBottoneComandi.height, 20, 20);
+                g.setColor(Color.BLACK);
+                g.drawString("COMANDI", areaBottoneComandi.x + 40, areaBottoneComandi.y + 45);
             }
         }
 
-        // --- SCHERMATA DI PAUSA ---
+        //schermata comandi
+        if (mostraComandi) {
+            g.setColor(new Color(0, 0, 0, 240));
+            g.fillRect(0, 0, larghezzaPannello, altezzaPannello);
+
+            disegnaMessaggioAlto(g, "COMANDI", Color.YELLOW, 80);
+
+            int xT = (larghezzaPannello / 2) - 330;
+            int yT = (altezzaPannello / 2) - 20;
+
+            g.setColor(Color.WHITE);
+            g.setFont(font.deriveFont(30f));  
+            g.setColor(Color.WHITE);
+
+            g.drawString("• FRECCE - WASD : Muovi Piattaforma", xT, yT);
+            g.drawString("• ESC: Pausa / Riprendi", xT, yT + 50);
+            g.drawString("• M: Mute Audio", xT, yT + 100);
+            g.drawString("• Premendo l'icona del volume si muta l'audio", xT, yT + 150);
+            g.drawString("• Premendo il tasto pausa il gioco va in pausa", xT, yT + 200);
+
+            g.setColor(Color.GRAY);
+            g.drawString("Clicca ovunque per tornare", (larghezzaPannello / 2) - 200, altezzaPannello - 80);
+        }
+
+        //schermata pausa
         if (isPausa && !gameOver && !vittoria) {
             g.setColor(new Color(0, 0, 0, 215)); 
             g.fillRect(0, 0, larghezzaPannello, altezzaPannello);
 
-            disegnaMessaggioPausa(g, "PAUSA", Color.YELLOW, 100);
+            disegnaMessaggioAlto(g, "PAUSA", Color.YELLOW, 100);
 
             int dimensionePlay = 80;
             areaBottonePlay.x = (larghezzaPannello - dimensionePlay) / 2;
@@ -294,13 +329,10 @@ class MyPanel extends JPanel {
             if (imgPlay != null) {
                 g.drawImage(imgPlay, areaBottonePlay.x, areaBottonePlay.y, 
                             areaBottonePlay.width, areaBottonePlay.height, this);
-            } else {
-                g.setColor(Color.GREEN);
-                g.fillOval(areaBottonePlay.x, areaBottonePlay.y, dimensionePlay, dimensionePlay);
             }
         }
 
-        // --- SCHERMATA VITTORIA ---
+        //schermata vittoria
         if (vittoria) {
             g.setColor(new Color(0, 0, 0, 215));
             g.fillRect(0, 0, larghezzaPannello, altezzaPannello);
@@ -311,7 +343,7 @@ class MyPanel extends JPanel {
             g.drawString("Premi 'R' per ricominciare", (larghezzaPannello / 2) - 130, (altezzaPannello / 2) + 120);
         }
 
-        // --- SCHERMATA GAME OVER ---
+        //schermata game over
         if (gameOver) {
             g.setColor(new Color(0, 0, 0, 215));
             g.fillRect(0, 0, larghezzaPannello, altezzaPannello);
@@ -324,7 +356,7 @@ class MyPanel extends JPanel {
 
             Image imgCorrenteReset = bottonePremuto ? imgBottonePressed : imgBottoneNormal;
             areaBottone.x = (larghezzaPannello - areaBottone.width) / 2;
-            areaBottone.y = (altezzaPannello / 2) + 100;
+            areaBottone.y = (altezzaPannello / 2) + 120;
             
             if (imgCorrenteReset != null) {
                 g.drawImage(imgCorrenteReset, areaBottone.x, areaBottone.y, areaBottone.width, areaBottone.height, this);
@@ -349,13 +381,13 @@ class MyPanel extends JPanel {
         g.drawString(testo, x, y);
     }
 
-    private void disegnaMessaggioPausa(Graphics g, String testo, Color colore, int dimensione) {
+    private void disegnaMessaggioAlto(Graphics g, String testo, Color colore, int dimensione) {
         // .deriveFont(float size) cambia la dimensione del font caricato
         g.setFont(font.deriveFont((float)dimensione)); 
         
         FontMetrics fm = g.getFontMetrics();
         int x = (larghezzaPannello - fm.stringWidth(testo)) / 2;
-        int y = altezzaPannello / 2 - 50;
+        int y = altezzaPannello / 2 - 80;
 
         // Ombra
         g.setColor(Color.BLACK);
@@ -536,4 +568,8 @@ class MyPanel extends JPanel {
     public Rectangle getAreaBottoneHome() {
         return areaBottoneHome;
     }
+
+    public Rectangle getAreaBottoneComandi() { return areaBottoneComandi; }
+    public boolean isMostraComandi() { return mostraComandi; }
+    public void setMostraComandi(boolean b) { this.mostraComandi = b; }
 }

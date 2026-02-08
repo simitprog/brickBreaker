@@ -73,6 +73,30 @@ public class MyMouseAdapter extends MouseAdapter {
                 return;
             }
         }
+
+        //nella schermata comandi, ogni click riporta alla Home
+        if (pannelloSuCuiLavorare.isMostraComandi()) {
+            pannelloSuCuiLavorare.setMostraComandi(false);
+            pannelloSuCuiLavorare.repaint();
+            return;
+        }
+
+        //gestione Home
+        if (!pannelloSuCuiLavorare.isGiocoIniziato() && !pannelloSuCuiLavorare.isGameOver()) {
+            //click su GIOCA
+            if (pannelloSuCuiLavorare.getAreaBottoneHome().contains(click)) {
+                pannelloSuCuiLavorare.iniziaPartita();
+                pannelloSuCuiLavorare.repaint();
+                return;
+            }
+            
+            //click su COMANDI (Nuovo)
+            if (pannelloSuCuiLavorare.getAreaBottoneComandi().contains(click)) {
+                pannelloSuCuiLavorare.setMostraComandi(true);
+                pannelloSuCuiLavorare.repaint();
+                return;
+            }
+        }
     }
 
     @Override
