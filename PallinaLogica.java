@@ -24,7 +24,7 @@ public class PallinaLogica implements Runnable {
             }
 
             try {
-                Thread.sleep(8); 
+                Thread.sleep(7); 
             } catch (InterruptedException e) {
                 break;
             }
@@ -74,23 +74,23 @@ public class PallinaLogica implements Runnable {
      * @brief controlla collisione con il giocatore
      */
     public void controllaRimbalzoGiocatore(giocatoreLogico giocatore) {
-        // controllo per vedere se la pallina tocca la racchetta
+        //controllo per vedere se la pallina tocca la racchetta
         if (posizione.getY() + (raggio * 2) >= giocatore.getPosizione().getY() &&
                 posizione.getX() + (raggio * 2) >= giocatore.getPosizione().getX() &&
                 posizione.getX() <= giocatore.getPosizione().getX() + giocatore.getLarghezza()) {
 
             // se la pallina sta scendendo
             if (velY > 0) {
-                // calcolo il centro della racchetta
+                //calcolo il centro della racchetta
                 double centroRacchetta = giocatore.getPosizione().getX() + (giocatore.getLarghezza() / 2);
 
-                // calcolo la distanza dal centro della pallina relativa alla racchetta
+                //calcolo la distanza dal centro della pallina relativa alla racchetta
                 double distanzaDalCentro = (posizione.getX() + raggio) - centroRacchetta;
 
-                // modifica la velocita' sulla x in modo tale da avere l'effetto di rimbalzo
+                //modifica la velocita' sulla x in modo tale da avere l'effetto di rimbalzo
                 velX = distanzaDalCentro / 22;
 
-                // la pallina rimbalza e va verso l'alto
+                //la pallina rimbalza e va verso l'alto
                 velY = -velY;
             }
         }

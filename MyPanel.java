@@ -153,7 +153,7 @@ class MyPanel extends JPanel {
             pCorrente.invertiY(); // La pallina che ha colpito rimbalza
 
             // Spawn Bonus 20%
-            if (Math.random() < 1.00) {
+            if (Math.random() < 0.20) {
                 int bx = (int) b.getLogico().posizione.getX();
                 int by = (int) b.getLogico().posizione.getY();
                 
@@ -340,10 +340,6 @@ class MyPanel extends JPanel {
             g.setColor(new Color(0, 0, 0, 215));
             g.fillRect(0, 0, larghezzaPannello, altezzaPannello);
             disegnaMessaggioCentrale(g, "VITTORIA!", Color.GREEN, 150);
-            
-            g.setFont(new Font("Verdana", Font.PLAIN, 20));
-            g.setColor(Color.WHITE);
-            g.drawString("Premi 'R' per ricominciare", (larghezzaPannello / 2) - 130, (altezzaPannello / 2) + 120);
 
             Image imgCorrenteReset = bottonePremuto ? imgBottonePressed : imgBottoneNormal;
             areaBottone.x = (larghezzaPannello - areaBottone.width) / 2;
