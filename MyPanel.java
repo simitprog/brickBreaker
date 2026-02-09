@@ -582,6 +582,7 @@ class MyPanel extends JPanel {
     public Rectangle getAreaBottoneHome() {
         return areaBottoneHome;
     }
+   
 
     public Rectangle getAreaBottoneComandi() { return areaBottoneComandi; }
     public boolean isMostraComandi() { return mostraComandi; }

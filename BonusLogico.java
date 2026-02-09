@@ -31,7 +31,8 @@ public class BonusLogico extends Thread{
 
     @Override 
     public void run(){
-        while(preso==false && coordinate.getY()<700&&pannello.isGameOver()==false){
+       
+        while(preso==false && coordinate.getY()<700&&pannello.isGameOver()==false&&pannello.isVittoria()==false){
             controllaCollisione(pannello.gl);
             //si muove solo se non è in pausa
             if(pannello.isPausa()==false){
