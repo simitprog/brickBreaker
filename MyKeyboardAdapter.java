@@ -22,11 +22,11 @@ public class MyKeyboardAdapter extends KeyAdapter {
             pannelloSuCuiLavorare.iniziaPartita();
         }
 
-        // 2. Reset del gioco
-        if (key == KeyEvent.VK_R && pannelloSuCuiLavorare.getCanReload()) {
+        // // 2. Reset del gioco
+        // if (key == KeyEvent.VK_R && pannelloSuCuiLavorare.getCanReload()) {
             
-            pannelloSuCuiLavorare.resetGioco();
-        }
+        //     pannelloSuCuiLavorare.resetGioco();
+        // }
 
         // 3. Controlli Musica
         if (key == KeyEvent.VK_H) {
