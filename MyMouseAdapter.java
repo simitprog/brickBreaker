@@ -53,7 +53,7 @@ public class MyMouseAdapter extends MouseAdapter {
         }
 
         //play again
-        if (pannelloSuCuiLavorare.isGameOver()) {
+        if (pannelloSuCuiLavorare.isGameOver() || pannelloSuCuiLavorare.isVittoria()) {
             Rectangle areaReset = pannelloSuCuiLavorare.getAreaBottone();
             if (areaReset != null && areaReset.contains(click)) {
                 pannelloSuCuiLavorare.setBottonePremuto(true); 

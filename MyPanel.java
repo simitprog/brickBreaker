@@ -30,7 +30,7 @@ class MyPanel extends JPanel {
     private Image imgDuplica = new ImageIcon("resources/bonus_duplica.png").getImage();
     private Image imgVelocita = new ImageIcon("resources/bonus_velocita.png").getImage();
 
-    private String[] playlist = {"inTheEnd_LP.wav", "decode_Paramore.wav", "spiders_SOAD.wav", "MyWay_LB.wav", "byTheWay_RHCP.wav"}; // Aggiungi i tuoi nomi reali
+    private String[] playlist = {"inTheEnd_LP.wav", "decode_Paramore.wav", "spiders_SOAD.wav", "MyWay_LB.wav", "byTheWay_RHCP.wav"};
     private int indiceMusica = 0;
     private Clip backgroundMusic;
     private boolean isMuted = false;
@@ -153,7 +153,7 @@ class MyPanel extends JPanel {
             pCorrente.invertiY(); // La pallina che ha colpito rimbalza
 
             // Spawn Bonus 20%
-            if (Math.random() < 0.20) {
+            if (Math.random() < 1.00) {
                 int bx = (int) b.getLogico().posizione.getX();
                 int by = (int) b.getLogico().posizione.getY();
                 
@@ -344,6 +344,14 @@ class MyPanel extends JPanel {
             g.setFont(new Font("Verdana", Font.PLAIN, 20));
             g.setColor(Color.WHITE);
             g.drawString("Premi 'R' per ricominciare", (larghezzaPannello / 2) - 130, (altezzaPannello / 2) + 120);
+
+            Image imgCorrenteReset = bottonePremuto ? imgBottonePressed : imgBottoneNormal;
+            areaBottone.x = (larghezzaPannello - areaBottone.width) / 2;
+            areaBottone.y = (altezzaPannello / 2) + 120;
+            
+            if (imgCorrenteReset != null) {
+                g.drawImage(imgCorrenteReset, areaBottone.x, areaBottone.y, areaBottone.width, areaBottone.height, this);
+            }
         }
 
         //schermata game over

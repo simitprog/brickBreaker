@@ -16,7 +16,7 @@ public class BonusLogico extends Thread{
         if(numerorandom==0){tipoBonus="Barralunga";}
         else if(numerorandom==1){tipoBonus="DuplicaPallina";}
         else{tipoBonus="VelocizzaBarra";}
-
+        tipoBonus="DuplicaPallina";
         this.velocitaCaduta=velocitaCaduta;
         this.coordinate=new Punto(x, y);
         this.durataEffetto=durataEffetto;
