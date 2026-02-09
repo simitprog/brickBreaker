@@ -193,9 +193,12 @@ class MyPanel extends JPanel {
     
 
     //metodo creato per aggiungere creare una nuova pallina
+    //i parametri sono la x e la y di una pallina già esistente
     public void aggiungiPallina(double x, double y){
+
         PallinaLogica nuova= new PallinaLogica(x, y, 10,larghezzaPannello, this);
         nuova.setAttiva(true);
+        //creo la pallina e la aggiungo alla lista delle palline
         PallinaGrafica nuovaG=new PallinaGrafica(nuova, Color.RED);
         listaPallineLogiche.add(nuova);
         listaPallineGrafiche.add(nuovaG);
@@ -400,6 +403,7 @@ class MyPanel extends JPanel {
 
     public void iniziaPartita() {
         if (!gameOver && !vittoria) {
+            //a inizio partita comincio con il svuotare le liste e creo la prima pallina
             listaPallineGrafiche.clear();
             listaPallineLogiche.clear();
             listaPallineLogiche.add(pl);
@@ -461,6 +465,7 @@ class MyPanel extends JPanel {
         pl.getPosizione().setY(600);
         pl.setAttiva(false);
 
+        //svuoto le varie liste
         listaBlocchi.clear();
         listaBonus.clear();
         listaPallineGrafiche.clear();
@@ -468,6 +473,7 @@ class MyPanel extends JPanel {
 
         double larghezzaBlocco = 142.85;
         double altezzaBlocco = 25;
+        //ricostruisco il campo di blocchi
         for (int i = 0; i < 6; i++) {
             for (int j = 0; j < 7; j++) {
                 double x = j * larghezzaBlocco;
@@ -475,7 +481,7 @@ class MyPanel extends JPanel {
                 listaBlocchi.add(new BloccoGrafico(new BloccoLogico(new Punto(x, y), altezzaBlocco, larghezzaBlocco)));
             }
         }
-
+        
         repaint();
         requestFocusInWindow();
     }

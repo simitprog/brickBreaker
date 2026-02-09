@@ -11,6 +11,7 @@ public class BonusLogico extends Thread{
 
 
     public BonusLogico(int x,int y, int velocitaCaduta, int durataEffetto,MyPanel p) {
+        //quando creo un bonus, questo ha l'effetto casuale
         int numerorandom=(int)(Math.random()*3);
         if(numerorandom==0){tipoBonus="Barralunga";}
         else if(numerorandom==1){tipoBonus="DuplicaPallina";}
@@ -64,7 +65,9 @@ public class BonusLogico extends Thread{
             pannello.gl.setVelocita(11.0);
         }else if(tipoBonus=="DuplicaPallina"){
             if(pannello.numPalline!=0){
+                //la pallina deve spawnare dove si trovava la più "vecchia".
                 PallinaLogica esistente= pannello.listaPallineLogiche.get(0);
+                //creo una nuova pallina con le coordinate di una già esistente
                 pannello.aggiungiPallina(esistente.getPosizione().getX(),esistente.getPosizione().getY());
             }
         }
