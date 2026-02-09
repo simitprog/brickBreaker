@@ -12,32 +12,34 @@ public class MyMouseAdapter extends MouseAdapter {
     }
 
     @Override
-    public void mouseMoved(MouseEvent e) {
-    }
-
-    @Override
     public void mousePressed(MouseEvent e) {
         pannelloSuCuiLavorare.requestFocusInWindow();
         Point click = e.getPoint();
 
-        // --- 1. PRIORITÀ: SCHERMATA COMANDI ---
-        // Se i comandi sono aperti, qualsiasi click li chiude e interrompe il metodo
+        // --- 1. SCHERMATA COMANDI ---
         if (pannelloSuCuiLavorare.isMostraComandi()) {
             pannelloSuCuiLavorare.setMostraComandi(false);
             pannelloSuCuiLavorare.repaint();
-            return; // Esci subito, non controllare altri bottoni
+            return;
         }
 
-        // --- 2. PAUSA ATTIVA ---
+        // --- 2. SCHERMATA PAUSA ---
         if (pannelloSuCuiLavorare.isPausa() && !pannelloSuCuiLavorare.isGameOver() && !pannelloSuCuiLavorare.isVittoria()) {
-            Rectangle areaPlayCentrale = pannelloSuCuiLavorare.getAreaBottonePlay();
-            if (areaPlayCentrale != null && areaPlayCentrale.contains(click)) {
-                pannelloSuCuiLavorare.setPausa(false);
-                return; 
+            // Bottone Torna Home
+            if (pannelloSuCuiLavorare.getAreaBottoneTornaHome().contains(click)) {
+                pannelloSuCuiLavorare.setTornaHomePremuto(true);
+                pannelloSuCuiLavorare.repaint();
+                return;
+            }
+            // NUOVO: Bottone Play (pressione)
+            if (pannelloSuCuiLavorare.getAreaBottonePlay().contains(click)) {
+                pannelloSuCuiLavorare.setPlayPremuto(true); // Cambia stato
+                pannelloSuCuiLavorare.repaint();
+                return;
             }
         }
 
-        // --- 3. VOLUME (Sempre cliccabile se non siamo nei comandi) ---
+        // --- 3. VOLUME (Sempre attivo se non in comandi) ---
         int dimVol = 40;
         int margVol = 10;
         Rectangle areaVolume = new Rectangle(margVol, pannelloSuCuiLavorare.getHeight() - dimVol - margVol, dimVol, dimVol);
@@ -46,29 +48,25 @@ public class MyMouseAdapter extends MouseAdapter {
             return;
         }
 
-        // --- 4. GESTIONE HOME (Solo se il gioco NON è iniziato) ---
+        // --- 4. SCHERMATA HOME (Gioco non iniziato) ---
         if (!pannelloSuCuiLavorare.isGiocoIniziato() && !pannelloSuCuiLavorare.isGameOver() && !pannelloSuCuiLavorare.isVittoria()) {
-            // Click su GIOCA
             if (pannelloSuCuiLavorare.getAreaBottoneHome().contains(click)) {
-                pannelloSuCuiLavorare.iniziaPartita();
+                pannelloSuCuiLavorare.setGiocaPremuto(true);
                 pannelloSuCuiLavorare.repaint();
                 return;
             }
-            
-            // Click su COMANDI
             if (pannelloSuCuiLavorare.getAreaBottoneComandi().contains(click)) {
-                pannelloSuCuiLavorare.setMostraComandi(true);
+                pannelloSuCuiLavorare.setComandiPremuto(true);
                 pannelloSuCuiLavorare.repaint();
                 return;
             }
         }
 
-        // --- 5. GIOCO IN CORSO (Pausa) ---
+        // --- 5. GIOCO IN CORSO (Click su icona Pausa) ---
         if (pannelloSuCuiLavorare.isGiocoIniziato() && !pannelloSuCuiLavorare.isPausa() && 
             !pannelloSuCuiLavorare.isGameOver() && !pannelloSuCuiLavorare.isVittoria()) {
             
-            Rectangle areaPausa = pannelloSuCuiLavorare.getAreaBottonePausa();
-            if (areaPausa != null && areaPausa.contains(click)) {
+            if (pannelloSuCuiLavorare.getAreaBottonePausa().contains(click)) {
                 pannelloSuCuiLavorare.setPausa(true);
                 return; 
             }
@@ -76,8 +74,7 @@ public class MyMouseAdapter extends MouseAdapter {
 
         // --- 6. FINE PARTITA (Reset) ---
         if (pannelloSuCuiLavorare.isGameOver() || pannelloSuCuiLavorare.isVittoria()) {
-            Rectangle areaReset = pannelloSuCuiLavorare.getAreaBottone();
-            if (areaReset != null && areaReset.contains(click)) {
+            if (pannelloSuCuiLavorare.getAreaBottone().contains(click)) {
                 pannelloSuCuiLavorare.setBottonePremuto(true); 
                 pannelloSuCuiLavorare.repaint();
             }
@@ -86,15 +83,51 @@ public class MyMouseAdapter extends MouseAdapter {
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        if ((pannelloSuCuiLavorare.isGameOver() || pannelloSuCuiLavorare.isVittoria()) 
-            && pannelloSuCuiLavorare.isBottonePremuto()) {
-            
-            Rectangle area = pannelloSuCuiLavorare.getAreaBottone();
-            if (area != null && area.contains(e.getPoint())) {
+        Point rilascio = e.getPoint();
+
+        // Rilascio Tasto GIOCA
+        if (pannelloSuCuiLavorare.isGiocaPremuto()) {
+            pannelloSuCuiLavorare.setGiocaPremuto(false);
+            if (pannelloSuCuiLavorare.getAreaBottoneHome().contains(rilascio)) {
+                pannelloSuCuiLavorare.iniziaPartita();
+            }
+            pannelloSuCuiLavorare.repaint();
+        }
+
+        // Rilascio Tasto COMANDI
+        if (pannelloSuCuiLavorare.isComandiPremuto()) {
+            pannelloSuCuiLavorare.setComandiPremuto(false);
+            if (pannelloSuCuiLavorare.getAreaBottoneComandi().contains(rilascio)) {
+                pannelloSuCuiLavorare.setMostraComandi(true);
+            }
+            pannelloSuCuiLavorare.repaint();
+        }
+
+        // Rilascio Tasto TORNA HOME (In Pausa)
+        if (pannelloSuCuiLavorare.isTornaHomePremuto()) {
+            pannelloSuCuiLavorare.setTornaHomePremuto(false);
+            if (pannelloSuCuiLavorare.getAreaBottoneTornaHome().contains(rilascio)) {
+                pannelloSuCuiLavorare.setPausa(false); 
+                pannelloSuCuiLavorare.resetGioco();    
+                pannelloSuCuiLavorare.stopSoundtrack(); 
+            }
+            pannelloSuCuiLavorare.repaint();
+        }
+
+        // Rilascio Tasto RESET (Game Over / Vittoria)
+        if (pannelloSuCuiLavorare.isBottonePremuto()) {
+            pannelloSuCuiLavorare.setBottonePremuto(false);
+            if (pannelloSuCuiLavorare.getAreaBottone().contains(rilascio)) {
                 pannelloSuCuiLavorare.resetGioco();
             }
-            
-            pannelloSuCuiLavorare.setBottonePremuto(false);
+            pannelloSuCuiLavorare.repaint();
+        }
+
+        if (pannelloSuCuiLavorare.isPlayPremuto()) {
+            pannelloSuCuiLavorare.setPlayPremuto(false); // Reset stato
+            if (pannelloSuCuiLavorare.getAreaBottonePlay().contains(rilascio)) {
+                pannelloSuCuiLavorare.setPausa(false); // Riprende il gioco
+            }
             pannelloSuCuiLavorare.repaint();
         }
     }
