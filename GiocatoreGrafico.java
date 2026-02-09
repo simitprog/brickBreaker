@@ -41,29 +41,20 @@ public class GiocatoreGrafico {
         int altezza = (int) giocatore.getAltezza();
 
         if (immaginePaddle != null) {
-            // Disegna l'immagine adattandola alle dimensioni logiche (importante per il bonus Barralunga)
+            //disegna l'immagine
             g.drawImage(immaginePaddle, x, y, larghezza, altezza, null);
         } else {
-            // Backup grafico nel caso l'immagine non venga trovata
+            //in caso di immagine non trovata disegna una forma
             g.setColor(java.awt.Color.GRAY);
             g.fillRect(x, y, larghezza, altezza);
         }
     }
 
-    // Getters e Setters
-    public giocatoreLogico getGiocatoreLogico() {
-        return giocatore;
-    }
+    //getter
+    public giocatoreLogico getGiocatoreLogico() { return giocatore; }
+    public Image getImmaginePaddle() { return immaginePaddle; }
 
-    public void setGiocatore(giocatoreLogico giocatore) {
-        this.giocatore = giocatore;
-    }
-
-    public Image getImmaginePaddle() {
-        return immaginePaddle;
-    }
-
-    public void setImmaginePaddle(Image immaginePaddle) {
-        this.immaginePaddle = immaginePaddle;
-    }
+    //setter
+    public void setGiocatore(giocatoreLogico giocatore) { this.giocatore = giocatore; }
+    public void setImmaginePaddle(Image immaginePaddle) { this.immaginePaddle = immaginePaddle; }
 }

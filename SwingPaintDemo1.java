@@ -2,6 +2,9 @@
 import javax.swing.SwingUtilities;
 import javax.swing.JFrame;
 
+//NOTE: il codice e' stato parzialmente ordinato e commentato da Gemini,
+//      e per alcune funzionalita' (come l'audio) e' stata usata IA
+
 public class SwingPaintDemo1 {
     
     public static void main(String[] args) {

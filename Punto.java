@@ -41,17 +41,25 @@ public class Punto{
     /**
      @brief Setter per la X
 
-    Questo metodo permette di settare la x del punto
-    @param  par1 x del punto
+     Questo metodo permette di settare la x del punto
+     @param  par1 x del punto
     */
     public void setX(double x){
         this.x = x;
     }
 
+    /**
+     * @brief getter della x
+     * @return valore della x
+     */
     public double getX(){
         return this.x;
     }
 
+    /**
+     * @brief getter della y
+     * @return valore della y
+     */
     public double getY(){
         return this.y;
     }

@@ -9,84 +9,86 @@ import javax.sound.sampled.*;
 import java.io.File;
 
 class MyPanel extends JPanel {
+    //finestra
     private int larghezzaPannello = 1050;
     private int altezzaPannello = 700;
 
-    private int larghezzaPiattaforma = 140;
-    private int altezzaPiattaforma = 20;
-
+    //variabili di stato
     private boolean giocoIniziato = false;
     private boolean gameOver = false;
     private boolean vittoria = false;
 
+    //font
     private Font font;
 
-    private Image imgBottoneNormal = new ImageIcon("resources/button_play_again.png").getImage();
-    private Image imgBottonePressed = new ImageIcon("resources/button_pressed_play_again.png").getImage();
+    //bottone
     private boolean bottonePremuto = false;
     private Rectangle areaBottone = new Rectangle(400, 450, 200, 60);
 
+    //barra
     private Image imgBarraLunga = new ImageIcon("resources/bonus_allunga.png").getImage();
     private Image imgDuplica = new ImageIcon("resources/bonus_duplica.png").getImage();
     private Image imgVelocita = new ImageIcon("resources/bonus_velocita.png").getImage();
+    private int larghezzaPiattaforma = 140;
+    private int altezzaPiattaforma = 20;
 
-    private String[] playlist = {"inTheEnd_LP.wav", "decode_Paramore.wav", "spiders_SOAD.wav", "MyWay_LB.wav", "byTheWay_RHCP.wav"};
-    private String[] nomeCanzoni={"In the End - Linkin Park", "Decode - Paramore", "Spiders - System of a Down", "My Way - Limp Bizkit", "By the Way - Red Hot Chilly Peppers"};
-    private String[] nomePhotoCanzone={"hybridTheory.png","brandNewEyes.png","soad.png","chocolateStafish.png", "btw.png"};
+    //musica
+    private String[] playlist = {"inTheEnd_LP.wav", "decode_Paramore.wav", "spiders_SOAD.wav", "BringMeToLife_evan.wav", "MyWay_LB.wav", "byTheWay_RHCP.wav", "MyOwnSummer_Deftones.wav", "Numb_LP.wav", "AllTheSmallThings_B182.wav", "Higher_Creed.wav"};
+    private String[] nomeCanzoni={"In the End - Linkin Park", "Decode - Paramore", "Spiders - System of a Down", "Bring me to Life - Evanescence" , "My Way - Limp Bizkit", "By the Way - Red Hot Chilly Peppers", "My Own Summer - Deftones", "Numb - Linkin Park", "All the Small Things - Blink182", "Higher - Creed"};
+    private String[] nomePhotoCanzone={"hybridTheory.png","brandNewEyes.png","soad.png", "fallen.png", "chocolateStafish.png", "btw.png", "aroundTheFur.png", "meteora.png", "enemsOfTheState.png", "humanClay.png"};
     private List<Image> coverAlbums = new ArrayList<>();
     private int indiceMusica = 0;
     private Clip backgroundMusic;
     private boolean isMuted = false;
 
+    //bottone volume
     private Image imgVolumeOn = new ImageIcon("resources/volumeOn.png").getImage();
     private Image imgVolumeOff = new ImageIcon("resources/volumeOff.png").getImage();
 
+
+    //bottone pausa/play
     private boolean isPausa = false;
     private Image imgPausa = new ImageIcon("resources/pause.png").getImage();
-
     private Image imgPlay = new ImageIcon("resources/play.png").getImage();
     private Image imgPlay_pressed = new ImageIcon("resources/play_Pressed.png").getImage();
     private boolean playPremuto = false;
-
     private Rectangle areaBottonePausa = new Rectangle(1000, 650, 40, 40);
     private Rectangle areaBottonePlay = new Rectangle(450, 345, 100,100);
 
-    // Giocatore
+    //giocatore
     public giocatoreLogico gl = new giocatoreLogico((larghezzaPannello - larghezzaPiattaforma) / 2, 630,
     larghezzaPiattaforma, altezzaPiattaforma, larghezzaPannello);
     public GiocatoreGrafico piattaforma = new GiocatoreGrafico(gl, Color.BLACK);
 
-    // Pallina
+    //pallina
     public PallinaLogica pl = new PallinaLogica(500, 600, 10, larghezzaPannello, this);
     public PallinaGrafica palla = new PallinaGrafica(pl, Color.RED);
-
     public List<PallinaGrafica> listaPallineGrafiche= new ArrayList<>();
     public List<PallinaLogica>listaPallineLogiche=new ArrayList<>();
     public int numPalline=1;
 
-
+    //blocchi
     private List<BloccoGrafico> listaBlocchi = new ArrayList<>();
     private List<BonusGrafico> listaBonus = new ArrayList<>();
     private Image sfondo;
     private Image immagineGameOver = new ImageIcon("resources/game_over_panel.png").getImage();
 
+    //home
     private Rectangle areaBottoneHome = new Rectangle(0, 0, 200, 60);
     private Image imgGioca = new ImageIcon("resources/button_gioca.png").getImage();
     private Image imgGiocaPressed = new ImageIcon("resources/button_gioca_pressed.png").getImage();
     private boolean giocaPremuto = false;
-
     private Image imgComandi = new ImageIcon("resources/button_comandi.png").getImage();
     private Image imgComandiPressed = new ImageIcon("resources/button_comandi_pressed.png").getImage();
     private boolean comandiPremuto = false;
-
     private Rectangle areaBottoneComandi = new Rectangle(0, 0, 200, 60);
     private boolean mostraComandi = false;
-
     private Image imgMainHome = new ImageIcon("resources/ButtonsMainMenu.png").getImage();
     private Image imgMainHomePressed = new ImageIcon("resources/ButtonsMainMenu_pressed.png").getImage();
     private Rectangle areaBottoneTornaHome = new Rectangle(0, 0, 200, 60);
     private boolean tornaHomePremuto = false;
 
+    //punteggio
     private int punteggio=0;
     private int moltiplicatore = 1;
     private int record;
@@ -103,7 +105,9 @@ class MyPanel extends JPanel {
         setBorder(BorderFactory.createLineBorder(Color.black));
 
         double larghezzaBlocco = 150;
-        double altezzaBlocco = 25;
+        double altezzaBlocco = 30;
+
+        caricaRecord();
 
         // inizializzazione blocchi
         for (int i = 0; i < nRighe; i++) {
@@ -123,7 +127,6 @@ class MyPanel extends JPanel {
         }
 
         try {
-            // Sostituisci "nome_tuo_font.ttf" con il nome esatto del file
             InputStream is = new BufferedInputStream(new FileInputStream("resources/font.ttf"));
             font = Font.createFont(Font.TRUETYPE_FONT, is);
         } catch (Exception e) {
@@ -340,7 +343,7 @@ class MyPanel extends JPanel {
             
             // Testo principale
             g.setColor(new Color(220, 220, 220));
-            g.drawString(titolo, xMusica + dimAlbum + 10, yMusica + 25);
+            g.drawString(titolo, xMusica + dimAlbum + 10, yMusica + 23);
 
 
             // --- DISEGNO PUNTEGGIO IN BASSO ---
@@ -365,7 +368,7 @@ class MyPanel extends JPanel {
 
         // 4. Overlay SCHERMATA HOME
         if (!giocoIniziato && !gameOver && !vittoria && !mostraComandi) {
-            g.setColor(new Color(0, 0, 0, 180));
+            g.setColor(new Color(0, 0, 0, 240));
             g.fillRect(0, 0, larghezzaPannello, altezzaPannello);
 
             disegnaMessaggio(g, "BRICK BREAKER", Color.CYAN, 100, 280);
@@ -399,27 +402,63 @@ class MyPanel extends JPanel {
             }
 
             disegnaMessaggio(g, "RECORD: " + record, Color.WHITE, 50, 560);
+
+            // --- INFO CANZONE (Copertina e Titolo) ---
+            int dimAlbum = 50;
+            // Posizionamento in basso a destra
+            int xMusica = 30; 
+            int yMusica = altezzaPannello - dimAlbum - 30;
+
+            // Disegno copertina (se presente nella lista)
+            if (indiceMusica < coverAlbums.size() && coverAlbums.get(indiceMusica) != null) {
+                g.drawImage(coverAlbums.get(indiceMusica), xMusica, yMusica, dimAlbum, dimAlbum, this);
+            }
+
+            // Disegno Titolo Canzone
+            g.setFont(font.deriveFont(25f));
+            String titolo = nomeCanzoni[indiceMusica];
+            
+            // Testo principale
+            g.setColor(new Color(220, 220, 220));
+            g.drawString(titolo, xMusica + dimAlbum + 10, yMusica + 30);
         }
 
         // 5. Overlay SCHERMATA COMANDI
         if (mostraComandi) {
             g.setColor(new Color(0, 0, 0, 240));
             g.fillRect(0, 0, larghezzaPannello, altezzaPannello);
-            disegnaMessaggio(g, "COMANDI", Color.YELLOW, 80, 250);
+            
+            // Titolo in GIALLO
+            disegnaMessaggio(g, "COMANDI", Color.YELLOW, 80, 200);
 
-            int xT = (larghezzaPannello / 2) - 330;
-            int yT = (altezzaPannello / 2) - 20;
+            int xT = (larghezzaPannello / 2) - 300;
+            int yStart = (altezzaPannello / 2) - 20;
+            int interlinea = 60;
+            float fontSize = 30f;
 
-            g.setColor(Color.WHITE);
-            g.setFont(font.deriveFont(30f));  
-            g.drawString("• FRECCE - WASD : Muovi Piattaforma", xT, yT);
-            g.drawString("• ESC: Pausa / Riprendi", xT, yT + 50);
-            g.drawString("• M: Mute Audio", xT, yT + 100);
-            g.drawString("• Premendo l'icona del volume si muta l'audio", xT, yT + 150);
-            g.drawString("• Premendo il tasto pausa il gioco va in pausa", xT, yT + 200);
+            // --- LISTA COMANDI ---
+            g.setFont(font.deriveFont(fontSize));
 
+            // Riga 1: MUOVI
+            g.setColor(Color.CYAN);   g.drawString("MUOVI:", xT+50, yStart);
+            g.setColor(Color.WHITE);  g.drawString("Frecce o WASD", xT + 185, yStart);
+
+            // Riga 2: PAUSA
+            g.setColor(Color.CYAN);   g.drawString("PAUSA:", xT+50, yStart + interlinea);
+            g.setColor(Color.WHITE);  g.drawString("ESC o Icona Pausa", xT + 185, yStart + interlinea);
+
+            // Riga 3: AUDIO
+            g.setColor(Color.CYAN);   g.drawString("AUDIO:", xT+50, yStart + (interlinea * 2));
+            g.setColor(Color.WHITE);  g.drawString("M o Icona Volume", xT + 185, yStart + (interlinea * 2));
+
+            // Riga 4: MUSICA
+            g.setColor(Color.CYAN);   g.drawString("MUSICA:", xT+50, yStart + (interlinea * 3));
+            g.setColor(Color.WHITE);  g.drawString("N per cambiare brano", xT + 185, yStart + (interlinea * 3));
+
+            // Chiusura in GRIGIO
             g.setColor(Color.GRAY);
-            g.drawString("Clicca ovunque per tornare", (larghezzaPannello / 2) - 200, altezzaPannello - 80);
+            g.setFont(font.deriveFont(24f));
+            g.drawString("Clicca ovunque per tornare", (larghezzaPannello / 2) - 180, altezzaPannello - 80);
         }
 
         // 6. Overlay SCHERMATA PAUSA
@@ -509,23 +548,6 @@ class MyPanel extends JPanel {
             disegnaMessaggio(g, "PUNTEGGIO ATTUALE: " + record, Color.WHITE, 40, 480);
             disegnaMessaggio(g, "RECORD: " + record, Color.WHITE, 40, 530);
         }
-    }
-
-    private void disegnaMessaggioCentrale(Graphics g, String testo, Color colore, int dimensione) {
-        // .deriveFont(float size) cambia la dimensione del font caricato
-        g.setFont(font.deriveFont((float)dimensione)); 
-        
-        FontMetrics fm = g.getFontMetrics();
-        int x = (larghezzaPannello - fm.stringWidth(testo)) / 2;
-        int y = altezzaPannello / 2;
-
-        // Ombra
-        g.setColor(Color.BLACK);
-        g.drawString(testo, x + 3, y + 3);
-        
-        // Testo principale
-        g.setColor(colore);
-        g.drawString(testo, x, y);
     }
 
     private void disegnaMessaggio(Graphics g, String testo, Color colore, int dimensione, int spostamentoY) {
