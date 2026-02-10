@@ -9,71 +9,76 @@ import javax.sound.sampled.*;
 import java.io.File;
 
 class MyPanel extends JPanel {
-    //finestra
+    // finestra
     private int larghezzaPannello = 1050;
     private int altezzaPannello = 700;
 
-    //variabili di stato
+    // variabili di stato
     private boolean giocoIniziato = false;
     private boolean gameOver = false;
     private boolean vittoria = false;
 
-    //font
+    // font
     private Font font;
 
-    //bottone
+    // bottone
     private boolean bottonePremuto = false;
     private Rectangle areaBottone = new Rectangle(400, 450, 200, 60);
 
-    //barra
+    // barra
     private Image imgBarraLunga = new ImageIcon("resources/bonus_allunga.png").getImage();
     private Image imgDuplica = new ImageIcon("resources/bonus_duplica.png").getImage();
     private Image imgVelocita = new ImageIcon("resources/bonus_velocita.png").getImage();
     private int larghezzaPiattaforma = 140;
     private int altezzaPiattaforma = 20;
 
-    //musica
-    private String[] playlist = {"inTheEnd_LP.wav", "decode_Paramore.wav", "spiders_SOAD.wav", "BringMeToLife_evan.wav", "MyWay_LB.wav", "byTheWay_RHCP.wav", "MyOwnSummer_Deftones.wav", "Numb_LP.wav", "AllTheSmallThings_B182.wav", "Higher_Creed.wav"};
-    private String[] nomeCanzoni={"In the End - Linkin Park", "Decode - Paramore", "Spiders - System of a Down", "Bring me to Life - Evanescence" , "My Way - Limp Bizkit", "By the Way - Red Hot Chilly Peppers", "My Own Summer - Deftones", "Numb - Linkin Park", "All the Small Things - Blink182", "Higher - Creed"};
-    private String[] nomePhotoCanzone={"hybridTheory.png","brandNewEyes.png","soad.png", "fallen.png", "chocolateStafish.png", "btw.png", "aroundTheFur.png", "meteora.png", "enemsOfTheState.png", "humanClay.png"};
+    // musica
+    private String[] playlist = { "inTheEnd_LP.wav", "decode_Paramore.wav", "spiders_SOAD.wav",
+            "BringMeToLife_evan.wav", "MyWay_LB.wav", "byTheWay_RHCP.wav", "MyOwnSummer_Deftones.wav", "Numb_LP.wav",
+            "AllTheSmallThings_B182.wav", "Higher_Creed.wav" };
+    private String[] nomeCanzoni = { "In the End - Linkin Park", "Decode - Paramore", "Spiders - System of a Down",
+            "Bring me to Life - Evanescence", "My Way - Limp Bizkit", "By the Way - Red Hot Chilly Peppers",
+            "My Own Summer - Deftones", "Numb - Linkin Park", "All the Small Things - Blink182", "Higher - Creed" };
+    private String[] nomePhotoCanzone = { "hybridTheory.png", "brandNewEyes.png", "soad.png", "fallen.png",
+            "chocolateStafish.png", "btw.png", "aroundTheFur.png", "meteora.png", "enemsOfTheState.png",
+            "humanClay.png" };
     private List<Image> coverAlbums = new ArrayList<>();
     private int indiceMusica = 0;
     private Clip backgroundMusic;
     private boolean isMuted = false;
 
-    //bottone volume
+    // bottone volume
     private Image imgVolumeOn = new ImageIcon("resources/volumeOn.png").getImage();
     private Image imgVolumeOff = new ImageIcon("resources/volumeOff.png").getImage();
 
-
-    //bottone pausa/play
+    // bottone pausa/play
     private boolean isPausa = false;
     private Image imgPausa = new ImageIcon("resources/pause.png").getImage();
     private Image imgPlay = new ImageIcon("resources/play.png").getImage();
     private Image imgPlay_pressed = new ImageIcon("resources/play_Pressed.png").getImage();
     private boolean playPremuto = false;
     private Rectangle areaBottonePausa = new Rectangle(1000, 650, 40, 40);
-    private Rectangle areaBottonePlay = new Rectangle(450, 345, 100,100);
+    private Rectangle areaBottonePlay = new Rectangle(450, 345, 100, 100);
 
-    //giocatore
+    // giocatore
     public giocatoreLogico gl = new giocatoreLogico((larghezzaPannello - larghezzaPiattaforma) / 2, 630,
-    larghezzaPiattaforma, altezzaPiattaforma, larghezzaPannello);
+            larghezzaPiattaforma, altezzaPiattaforma, larghezzaPannello);
     public GiocatoreGrafico piattaforma = new GiocatoreGrafico(gl, Color.BLACK);
 
-    //pallina
+    // pallina
     public PallinaLogica pl = new PallinaLogica(500, 600, 10, larghezzaPannello, this);
     public PallinaGrafica palla = new PallinaGrafica(pl, Color.RED);
-    public List<PallinaGrafica> listaPallineGrafiche= new ArrayList<>();
-    public List<PallinaLogica>listaPallineLogiche=new ArrayList<>();
-    public int numPalline=1;
+    public List<PallinaGrafica> listaPallineGrafiche = new ArrayList<>();
+    public List<PallinaLogica> listaPallineLogiche = new ArrayList<>();
+    public int numPalline = 1;
 
-    //blocchi
+    // blocchi
     private List<BloccoGrafico> listaBlocchi = new ArrayList<>();
     private List<BonusGrafico> listaBonus = new ArrayList<>();
     private Image sfondo;
     private Image immagineGameOver = new ImageIcon("resources/game_over_panel.png").getImage();
 
-    //home
+    // home
     private Rectangle areaBottoneHome = new Rectangle(0, 0, 200, 60);
     private Image imgGioca = new ImageIcon("resources/button_gioca.png").getImage();
     private Image imgGiocaPressed = new ImageIcon("resources/button_gioca_pressed.png").getImage();
@@ -88,13 +93,13 @@ class MyPanel extends JPanel {
     private Rectangle areaBottoneTornaHome = new Rectangle(0, 0, 200, 60);
     private boolean tornaHomePremuto = false;
 
-    //punteggio
-    private int punteggio=0;
+    // punteggio
+    private int punteggio = 0;
     private int moltiplicatore = 1;
     private int record;
     private final String FILE_RECORD = "highscore.txt";
 
-    public boolean getCanReload(){
+    public boolean getCanReload() {
         return gameOver || vittoria;
     }
 
@@ -120,7 +125,8 @@ class MyPanel extends JPanel {
             }
         }
 
-        sfondo = new ImageIcon("resources/bg1.png").getImage(); //c'e' n'e' un altro nelle resources, pero' questo fa vedere meglio la pallina
+        sfondo = new ImageIcon("resources/bg1.png").getImage(); // c'e' n'e' un altro nelle resources, pero' questo fa
+                                                                // vedere meglio la pallina
 
         for (String nomeFile : nomePhotoCanzone) {
             coverAlbums.add(new ImageIcon("resources/" + nomeFile).getImage());
@@ -162,43 +168,41 @@ class MyPanel extends JPanel {
         // 1. RIMBALZO GIOCATORE E RESET MOLTIPLICATORE
         for (int i = listaPallineLogiche.size() - 1; i >= 0; i--) {
             PallinaLogica p = listaPallineLogiche.get(i);
-            
+
             // Creiamo un rettangolo temporaneo per la pallina
             java.awt.Rectangle rectPallina = new java.awt.Rectangle(
-                (int)p.getPosizione().getX(), 
-                (int)p.getPosizione().getY(), 
-                (int)p.getRaggio() * 2, 
-                (int)p.getRaggio() * 2
-            );
+                    (int) p.getPosizione().getX(),
+                    (int) p.getPosizione().getY(),
+                    (int) p.getRaggio() * 2,
+                    (int) p.getRaggio() * 2);
 
             // Creiamo un rettangolo temporaneo per il giocatore (gl)
             java.awt.Rectangle rectGiocatore = new java.awt.Rectangle(
-                (int)gl.getPosizione().getX(), 
-                (int)gl.getPosizione().getY(), 
-                (int)gl.getLarghezza(), 
-                (int)gl.getAltezza()
-            );
+                    (int) gl.getPosizione().getX(),
+                    (int) gl.getPosizione().getY(),
+                    (int) gl.getLarghezza(),
+                    (int) gl.getAltezza());
 
             // Ora il controllo .intersects() funzionerà perfettamente
             if (rectPallina.intersects(rectGiocatore)) {
-                moltiplicatore = 1; 
+                moltiplicatore = 1;
             }
-            
+
             p.controllaRimbalzoGiocatore(gl);
         }
 
         // 2. CONTROLLO SCONFITTA (Caduta pallina)
         for (int i = listaPallineLogiche.size() - 1; i >= 0; i--) {
-            if (listaPallineLogiche.get(i).getPosizione().getY() + (listaPallineLogiche.get(i).getRaggio() * 2) > altezzaPannello) {
+            if (listaPallineLogiche.get(i).getPosizione().getY()
+                    + (listaPallineLogiche.get(i).getRaggio() * 2) > altezzaPannello) {
                 listaPallineLogiche.get(i).setAttiva(false);
                 listaPallineGrafiche.remove(i);
                 listaPallineLogiche.remove(i);
                 numPalline--;
-                
+
                 // Reset moltiplicatore anche quando si perde una pallina
                 moltiplicatore = 1;
 
-                
             }
         }
 
@@ -208,7 +212,7 @@ class MyPanel extends JPanel {
 
             listaBlocchi.removeIf(b -> {
                 if (b.getLogico().collisione(pCorrente)) {
-                    pCorrente.invertiY(); 
+                    pCorrente.invertiY();
 
                     // Calcolo punteggio con moltiplicatore
                     punteggio += 100;
@@ -235,7 +239,7 @@ class MyPanel extends JPanel {
                         listaBonus.add(boG);
                         new Thread(boL).start();
                     }
-                    return true; 
+                    return true;
                 }
                 return false;
             });
@@ -253,7 +257,7 @@ class MyPanel extends JPanel {
             }
         }
 
-        //controllo punteggio massimo
+        // controllo punteggio massimo
         if (listaBlocchi.isEmpty()) {
             vittoria = true;
             // Anche in caso di vittoria controlliamo il record
@@ -266,24 +270,21 @@ class MyPanel extends JPanel {
             }
         }
     }
-    
 
-    //metodo creato per aggiungere creare una nuova pallina
-    //i parametri sono la x e la y di una pallina già esistente
-    public void aggiungiPallina(double x, double y){
+    // metodo creato per aggiungere creare una nuova pallina
+    // i parametri sono la x e la y di una pallina già esistente
+    public void aggiungiPallina(double x, double y) {
 
-        PallinaLogica nuova= new PallinaLogica(x, y, 10,larghezzaPannello, this);
+        PallinaLogica nuova = new PallinaLogica(x, y, 10, larghezzaPannello, this);
         nuova.setAttiva(true);
-        //creo la pallina e la aggiungo alla lista delle palline
-        PallinaGrafica nuovaG=new PallinaGrafica(nuova, Color.RED);
+        // creo la pallina e la aggiungo alla lista delle palline
+        PallinaGrafica nuovaG = new PallinaGrafica(nuova, Color.RED);
         listaPallineLogiche.add(nuova);
         listaPallineGrafiche.add(nuovaG);
         Thread nuovoThread = new Thread(nuova);
         nuovoThread.start();
         numPalline++;
     }
-
-  
 
     @Override
     public void paintComponent(Graphics g) {
@@ -313,8 +314,8 @@ class MyPanel extends JPanel {
         if (giocoIniziato && !gameOver && !vittoria && !isPausa) {
             // Bottone pausa in alto/lato
             if (imgPausa != null) {
-                g.drawImage(imgPausa, areaBottonePausa.x, areaBottonePausa.y, 
-                            areaBottonePausa.width, areaBottonePausa.height, this);
+                g.drawImage(imgPausa, areaBottonePausa.x, areaBottonePausa.y,
+                        areaBottonePausa.width, areaBottonePausa.height, this);
             }
 
             // Icona volume
@@ -322,14 +323,14 @@ class MyPanel extends JPanel {
             if (iconaVolume != null) {
                 int dimensioneIcona = 35;
                 int margine = 10;
-                g.drawImage(iconaVolume, margine, altezzaPannello - dimensioneIcona - margine, 
-                            dimensioneIcona, dimensioneIcona, this);
+                g.drawImage(iconaVolume, margine, altezzaPannello - dimensioneIcona - margine,
+                        dimensioneIcona, dimensioneIcona, this);
             }
 
             // --- INFO CANZONE (Copertina e Titolo) ---
             int dimAlbum = 35;
             // Posizionamento in basso a destra
-            int xMusica = larghezzaPannello - 500; 
+            int xMusica = larghezzaPannello - 500;
             int yMusica = altezzaPannello - dimAlbum - 10;
 
             // Disegno copertina (se presente nella lista)
@@ -340,29 +341,28 @@ class MyPanel extends JPanel {
             // Disegno Titolo Canzone
             g.setFont(font.deriveFont(16f));
             String titolo = nomeCanzoni[indiceMusica];
-            
+
             // Testo principale
             g.setColor(new Color(220, 220, 220));
             g.drawString(titolo, xMusica + dimAlbum + 10, yMusica + 23);
 
-
             // --- DISEGNO PUNTEGGIO IN BASSO ---
-            g.setFont(font.deriveFont(25f)); 
+            g.setFont(font.deriveFont(25f));
             g.setColor(Color.WHITE);
 
-            String testoPunteggio = "PUNTEGGIO: " + punteggio; 
+            String testoPunteggio = "PUNTEGGIO: " + punteggio;
             FontMetrics fm = g.getFontMetrics();
 
             // Calcolo posizione originale
             int xPunteggio = (larghezzaPannello - fm.stringWidth(testoPunteggio)) / 2 - 200;
-            int yPunteggio = altezzaPannello - 20; 
+            int yPunteggio = altezzaPannello - 20;
 
             // Ombra per leggibilità
             g.setColor(Color.BLACK);
             g.drawString(testoPunteggio, xPunteggio + 2, yPunteggio + 2);
 
             // Testo principale
-            g.setColor(Color.WHITE); 
+            g.setColor(Color.WHITE);
             g.drawString(testoPunteggio, xPunteggio, yPunteggio);
         }
 
@@ -381,10 +381,12 @@ class MyPanel extends JPanel {
             areaBottoneHome.setBounds(xCentrale - 130, (altezzaPannello / 2) + 30, larghezzaB, altezzaB);
             Image imgCorrenteGioca = giocaPremuto ? imgGiocaPressed : imgGioca;
             if (imgCorrenteGioca != null && imgCorrenteGioca.getWidth(null) != -1) {
-                g.drawImage(imgCorrenteGioca, areaBottoneHome.x, areaBottoneHome.y, areaBottoneHome.width, areaBottoneHome.height, this);
+                g.drawImage(imgCorrenteGioca, areaBottoneHome.x, areaBottoneHome.y, areaBottoneHome.width,
+                        areaBottoneHome.height, this);
             } else {
                 g.setColor(Color.WHITE);
-                g.fillRoundRect(areaBottoneHome.x, areaBottoneHome.y, areaBottoneHome.width, areaBottoneHome.height, 20, 20);
+                g.fillRoundRect(areaBottoneHome.x, areaBottoneHome.y, areaBottoneHome.width, areaBottoneHome.height, 20,
+                        20);
                 g.setColor(Color.BLACK);
                 g.drawString("GIOCA", areaBottoneHome.x + 60, areaBottoneHome.y + 25);
             }
@@ -393,10 +395,12 @@ class MyPanel extends JPanel {
             areaBottoneComandi.setBounds(xCentrale + 130, (altezzaPannello / 2) + 30, larghezzaB, altezzaB);
             Image imgCorrenteComandi = comandiPremuto ? imgComandiPressed : imgComandi;
             if (imgCorrenteComandi != null && imgCorrenteComandi.getWidth(null) != -1) {
-                g.drawImage(imgCorrenteComandi, areaBottoneComandi.x, areaBottoneComandi.y, areaBottoneComandi.width, areaBottoneComandi.height, this);
+                g.drawImage(imgCorrenteComandi, areaBottoneComandi.x, areaBottoneComandi.y, areaBottoneComandi.width,
+                        areaBottoneComandi.height, this);
             } else {
                 g.setColor(new Color(200, 200, 200));
-                g.fillRoundRect(areaBottoneComandi.x, areaBottoneComandi.y, areaBottoneComandi.width, areaBottoneComandi.height, 20, 20);
+                g.fillRoundRect(areaBottoneComandi.x, areaBottoneComandi.y, areaBottoneComandi.width,
+                        areaBottoneComandi.height, 20, 20);
                 g.setColor(Color.BLACK);
                 g.drawString("COMANDI", areaBottoneComandi.x + 40, areaBottoneComandi.y + 25);
             }
@@ -406,7 +410,7 @@ class MyPanel extends JPanel {
             // --- INFO CANZONE (Copertina e Titolo) ---
             int dimAlbum = 50;
             // Posizionamento in basso a destra
-            int xMusica = 30; 
+            int xMusica = 30;
             int yMusica = altezzaPannello - dimAlbum - 30;
 
             // Disegno copertina (se presente nella lista)
@@ -417,7 +421,7 @@ class MyPanel extends JPanel {
             // Disegno Titolo Canzone
             g.setFont(font.deriveFont(25f));
             String titolo = nomeCanzoni[indiceMusica];
-            
+
             // Testo principale
             g.setColor(new Color(220, 220, 220));
             g.drawString(titolo, xMusica + dimAlbum + 10, yMusica + 30);
@@ -427,7 +431,7 @@ class MyPanel extends JPanel {
         if (mostraComandi) {
             g.setColor(new Color(0, 0, 0, 240));
             g.fillRect(0, 0, larghezzaPannello, altezzaPannello);
-            
+
             // Titolo in GIALLO
             disegnaMessaggio(g, "COMANDI", Color.YELLOW, 80, 200);
 
@@ -440,20 +444,28 @@ class MyPanel extends JPanel {
             g.setFont(font.deriveFont(fontSize));
 
             // Riga 1: MUOVI
-            g.setColor(Color.CYAN);   g.drawString("MUOVI:", xT+50, yStart);
-            g.setColor(Color.WHITE);  g.drawString("Frecce o WASD", xT + 185, yStart);
+            g.setColor(Color.CYAN);
+            g.drawString("MUOVI:", xT + 50, yStart);
+            g.setColor(Color.WHITE);
+            g.drawString("Frecce o WASD", xT + 185, yStart);
 
             // Riga 2: PAUSA
-            g.setColor(Color.CYAN);   g.drawString("PAUSA:", xT+50, yStart + interlinea);
-            g.setColor(Color.WHITE);  g.drawString("ESC o Icona Pausa", xT + 185, yStart + interlinea);
+            g.setColor(Color.CYAN);
+            g.drawString("PAUSA:", xT + 50, yStart + interlinea);
+            g.setColor(Color.WHITE);
+            g.drawString("ESC o Icona Pausa", xT + 185, yStart + interlinea);
 
             // Riga 3: AUDIO
-            g.setColor(Color.CYAN);   g.drawString("AUDIO:", xT+50, yStart + (interlinea * 2));
-            g.setColor(Color.WHITE);  g.drawString("M o Icona Volume", xT + 185, yStart + (interlinea * 2));
+            g.setColor(Color.CYAN);
+            g.drawString("AUDIO:", xT + 50, yStart + (interlinea * 2));
+            g.setColor(Color.WHITE);
+            g.drawString("M o Icona Volume", xT + 185, yStart + (interlinea * 2));
 
             // Riga 4: MUSICA
-            g.setColor(Color.CYAN);   g.drawString("MUSICA:", xT+50, yStart + (interlinea * 3));
-            g.setColor(Color.WHITE);  g.drawString("N per cambiare brano", xT + 185, yStart + (interlinea * 3));
+            g.setColor(Color.CYAN);
+            g.drawString("MUSICA:", xT + 50, yStart + (interlinea * 3));
+            g.setColor(Color.WHITE);
+            g.drawString("H per cambiare brano", xT + 185, yStart + (interlinea * 3));
 
             // Chiusura in GRIGIO
             g.setColor(Color.GRAY);
@@ -463,7 +475,7 @@ class MyPanel extends JPanel {
 
         // 6. Overlay SCHERMATA PAUSA
         if (isPausa && !gameOver && !vittoria) {
-            g.setColor(new Color(0, 0, 0, 215)); 
+            g.setColor(new Color(0, 0, 0, 215));
             g.fillRect(0, 0, larghezzaPannello, altezzaPannello);
             disegnaMessaggio(g, "PAUSA", Color.YELLOW, 100, 280);
 
@@ -478,25 +490,25 @@ class MyPanel extends JPanel {
             Image imgDaDisegnarePlay = playPremuto ? imgPlay_pressed : imgPlay;
 
             if (imgDaDisegnarePlay != null) {
-                g.drawImage(imgDaDisegnarePlay, areaBottonePlay.x, areaBottonePlay.y, 
-                            areaBottonePlay.width, areaBottonePlay.height, this);
+                g.drawImage(imgDaDisegnarePlay, areaBottonePlay.x, areaBottonePlay.y,
+                        areaBottonePlay.width, areaBottonePlay.height, this);
             }
 
             // --- Bottone TORNA HOME (Posizione originale) ---
             int larghezzaH = 300;
             int altezzaH = 80;
-            
+
             // Ripristino del tuo calcolo originale per la posizione X
-            int xHome = (larghezzaPannello - larghezzaH) - 335; 
+            int xHome = (larghezzaPannello - larghezzaH) - 335;
             int yHome = areaBottonePlay.y; // Stessa Y del bottone Play come prima
-            
+
             areaBottoneTornaHome.setBounds(xHome, yHome, larghezzaH, altezzaH);
-            
+
             Image imgCorrenteMainHome = tornaHomePremuto ? imgMainHomePressed : imgMainHome;
-            
+
             if (imgCorrenteMainHome != null) {
-                g.drawImage(imgCorrenteMainHome, areaBottoneTornaHome.x, areaBottoneTornaHome.y, 
-                            areaBottoneTornaHome.width, areaBottoneTornaHome.height, this);
+                g.drawImage(imgCorrenteMainHome, areaBottoneTornaHome.x, areaBottoneTornaHome.y,
+                        areaBottoneTornaHome.width, areaBottoneTornaHome.height, this);
             }
         }
 
@@ -504,18 +516,21 @@ class MyPanel extends JPanel {
         if (vittoria) {
             g.setColor(new Color(0, 0, 0, 215));
             g.fillRect(0, 0, larghezzaPannello, altezzaPannello);
-            disegnaMessaggio(g, "VITTORIA!", Color.GREEN, 150,250);
+            disegnaMessaggio(g, "VITTORIA!", Color.GREEN, 150, 250);
 
-            // Configuriamo il bottone (usiamo le stesse dimensioni della pausa se vuoi coerenza)
-            int larghezzaReset = 300; 
+            // Configuriamo il bottone (usiamo le stesse dimensioni della pausa se vuoi
+            // coerenza)
+            int larghezzaReset = 300;
             int altezzaReset = 80;
-            areaBottone.setBounds((larghezzaPannello - larghezzaReset) / 2, (altezzaPannello / 2) -30 , larghezzaReset, altezzaReset);
-            
+            areaBottone.setBounds((larghezzaPannello - larghezzaReset) / 2, (altezzaPannello / 2) - 30, larghezzaReset,
+                    altezzaReset);
+
             // Scegliamo l'immagine (usiamo quelle della home/pausa come hai chiesto)
             Image imgCorrenteReset = bottonePremuto ? imgMainHomePressed : imgMainHome;
-            
+
             if (imgCorrenteReset != null) {
-                g.drawImage(imgCorrenteReset, areaBottone.x, areaBottone.y, areaBottone.width, areaBottone.height, this);
+                g.drawImage(imgCorrenteReset, areaBottone.x, areaBottone.y, areaBottone.width, areaBottone.height,
+                        this);
             }
 
             disegnaMessaggio(g, "PUNTEGGIO ATTUALE: " + record, Color.WHITE, 40, 480);
@@ -528,7 +543,8 @@ class MyPanel extends JPanel {
             g.fillRect(0, 0, larghezzaPannello, altezzaPannello);
 
             if (immagineGameOver != null) {
-                //g.drawImage(immagineGameOver, 0, 0, larghezzaPannello, altezzaPannello, this);
+                // g.drawImage(immagineGameOver, 0, 0, larghezzaPannello, altezzaPannello,
+                // this);
             }
 
             disegnaMessaggio(g, "GAME OVER", Color.RED, 150, 250);
@@ -536,13 +552,15 @@ class MyPanel extends JPanel {
             // Configuriamo il bottone
             int larghezzaReset = 300;
             int altezzaReset = 80;
-            areaBottone.setBounds((larghezzaPannello - larghezzaReset) / 2, (altezzaPannello / 2) -30 , larghezzaReset, altezzaReset);
-            
+            areaBottone.setBounds((larghezzaPannello - larghezzaReset) / 2, (altezzaPannello / 2) - 30, larghezzaReset,
+                    altezzaReset);
+
             // Scegliamo l'immagine
             Image imgCorrenteReset = bottonePremuto ? imgMainHomePressed : imgMainHome;
-            
+
             if (imgCorrenteReset != null) {
-                g.drawImage(imgCorrenteReset, areaBottone.x, areaBottone.y, areaBottone.width, areaBottone.height, this);
+                g.drawImage(imgCorrenteReset, areaBottone.x, areaBottone.y, areaBottone.width, areaBottone.height,
+                        this);
             }
 
             disegnaMessaggio(g, "PUNTEGGIO ATTUALE: " + record, Color.WHITE, 40, 480);
@@ -552,8 +570,8 @@ class MyPanel extends JPanel {
 
     private void disegnaMessaggio(Graphics g, String testo, Color colore, int dimensione, int spostamentoY) {
         // .deriveFont(float size) cambia la dimensione del font caricato
-        g.setFont(font.deriveFont((float)dimensione)); 
-        
+        g.setFont(font.deriveFont((float) dimensione));
+
         FontMetrics fm = g.getFontMetrics();
         int x = (larghezzaPannello - fm.stringWidth(testo)) / 2;
         int y = spostamentoY;
@@ -561,7 +579,7 @@ class MyPanel extends JPanel {
         // Ombra
         g.setColor(Color.BLACK);
         g.drawString(testo, x + 3, y + 3);
-        
+
         // Testo principale
         g.setColor(colore);
         g.drawString(testo, x, y);
@@ -569,7 +587,7 @@ class MyPanel extends JPanel {
 
     public void iniziaPartita() {
         if (!gameOver && !vittoria) {
-            //a inizio partita comincio con il svuotare le liste e creo la prima pallina
+            // a inizio partita comincio con il svuotare le liste e creo la prima pallina
             listaPallineGrafiche.clear();
             listaPallineLogiche.clear();
             listaPallineLogiche.add(pl);
@@ -581,7 +599,7 @@ class MyPanel extends JPanel {
         if (backgroundMusic == null) {
             playSoundtrack("inTheEnd_LP.wav");
         }
-        
+
         this.giocoIniziato = true;
         this.pl.setAttiva(true);
     }
@@ -611,19 +629,25 @@ class MyPanel extends JPanel {
         return giocoIniziato;
     }
 
-    public Rectangle getAreaBottone() { return areaBottone; }
-    public boolean isBottonePremuto() { return bottonePremuto; }
-    public void setBottonePremuto(boolean stato) { this.bottonePremuto = stato; }
+    public Rectangle getAreaBottone() {
+        return areaBottone;
+    }
+
+    public boolean isBottonePremuto() {
+        return bottonePremuto;
+    }
+
+    public void setBottonePremuto(boolean stato) {
+        this.bottonePremuto = stato;
+    }
 
     public void resetGioco() {
         this.gameOver = false;
         this.vittoria = false;
         this.giocoIniziato = false;
-        this.numPalline=1;
+        this.numPalline = 1;
 
-        
-
-        //reset posizione giocatore
+        // reset posizione giocatore
         gl.getPosizione().setX((larghezzaPannello - larghezzaPiattaforma) / 2);
         gl.getPosizione().setY(630);
 
@@ -631,7 +655,7 @@ class MyPanel extends JPanel {
         pl.getPosizione().setY(600);
         pl.setAttiva(false);
 
-        //svuoto le varie liste
+        // svuoto le varie liste
         listaBlocchi.clear();
         listaBonus.clear();
         listaPallineGrafiche.clear();
@@ -639,7 +663,7 @@ class MyPanel extends JPanel {
 
         double larghezzaBlocco = 150;
         double altezzaBlocco = 25;
-        //ricostruisco il campo di blocchi
+        // ricostruisco il campo di blocchi
         for (int i = 0; i < 6; i++) {
             for (int j = 0; j < 7; j++) {
                 double x = j * larghezzaBlocco;
@@ -648,8 +672,8 @@ class MyPanel extends JPanel {
             }
         }
 
-        punteggio=0;
-        
+        punteggio = 0;
+
         repaint();
         requestFocusInWindow();
     }
@@ -658,7 +682,7 @@ class MyPanel extends JPanel {
         try {
             // 1. FERMA E CHIUDI la musica precedente se esiste
             if (backgroundMusic != null) {
-                backgroundMusic.stop();  // Ferma la riproduzione
+                backgroundMusic.stop(); // Ferma la riproduzione
                 backgroundMusic.flush(); // Svuota il buffer dei dati
                 backgroundMusic.close(); // Rilascia le risorse di sistema
             }
@@ -666,15 +690,15 @@ class MyPanel extends JPanel {
             // 2. Carica il nuovo file
             File soundFile = new File("resources/soundtracks/" + filename);
             AudioInputStream audioStream = AudioSystem.getAudioInputStream(soundFile);
-            
+
             // 3. Crea il nuovo clip
             backgroundMusic = AudioSystem.getClip();
             backgroundMusic.open(audioStream);
-            
+
             // 4. Avvia il loop
             backgroundMusic.loop(Clip.LOOP_CONTINUOUSLY);
             backgroundMusic.start();
-            
+
         } catch (Exception e) {
             System.out.println("Errore audio: " + e.getMessage());
             e.printStackTrace();
@@ -693,11 +717,12 @@ class MyPanel extends JPanel {
     }
 
     public void toggleMute() {
-        if (backgroundMusic == null) return;
+        if (backgroundMusic == null)
+            return;
 
         // Otteniamo il controllo del volume del clip
         FloatControl gainControl = (FloatControl) backgroundMusic.getControl(FloatControl.Type.MASTER_GAIN);
-        
+
         if (!isMuted) {
             // Mettiamo il volume al minimo possibile (silenzio assoluto)
             gainControl.setValue(gainControl.getMinimum());
@@ -715,7 +740,7 @@ class MyPanel extends JPanel {
 
     public void setPausa(boolean pausa) {
         this.isPausa = pausa;
-        
+
         if (backgroundMusic != null) {
             if (isPausa) {
                 backgroundMusic.stop();
@@ -742,20 +767,54 @@ class MyPanel extends JPanel {
     public Rectangle getAreaBottoneHome() {
         return areaBottoneHome;
     }
-   
 
-    public Rectangle getAreaBottoneComandi() { return areaBottoneComandi; }
-    public boolean isMostraComandi() { return mostraComandi; }
-    public void setMostraComandi(boolean b) { this.mostraComandi = b; }
-    public void setGiocaPremuto(boolean b) { this.giocaPremuto = b; }
-    public boolean isGiocaPremuto() { return giocaPremuto; }
-    public void setComandiPremuto(boolean b) { this.comandiPremuto = b; }
-    public boolean isComandiPremuto() { return comandiPremuto; }
-    public Rectangle getAreaBottoneTornaHome() { return areaBottoneTornaHome; }
-    public void setTornaHomePremuto(boolean b) { this.tornaHomePremuto = b; }
-    public boolean isTornaHomePremuto() { return tornaHomePremuto; }
-    public void setPlayPremuto(boolean b) { this.playPremuto = b; }
-    public boolean isPlayPremuto() { return playPremuto; }
+    public Rectangle getAreaBottoneComandi() {
+        return areaBottoneComandi;
+    }
+
+    public boolean isMostraComandi() {
+        return mostraComandi;
+    }
+
+    public void setMostraComandi(boolean b) {
+        this.mostraComandi = b;
+    }
+
+    public void setGiocaPremuto(boolean b) {
+        this.giocaPremuto = b;
+    }
+
+    public boolean isGiocaPremuto() {
+        return giocaPremuto;
+    }
+
+    public void setComandiPremuto(boolean b) {
+        this.comandiPremuto = b;
+    }
+
+    public boolean isComandiPremuto() {
+        return comandiPremuto;
+    }
+
+    public Rectangle getAreaBottoneTornaHome() {
+        return areaBottoneTornaHome;
+    }
+
+    public void setTornaHomePremuto(boolean b) {
+        this.tornaHomePremuto = b;
+    }
+
+    public boolean isTornaHomePremuto() {
+        return tornaHomePremuto;
+    }
+
+    public void setPlayPremuto(boolean b) {
+        this.playPremuto = b;
+    }
+
+    public boolean isPlayPremuto() {
+        return playPremuto;
+    }
 
     private void salvaRecord() {
         try (java.io.PrintWriter out = new java.io.PrintWriter(new java.io.FileWriter(FILE_RECORD))) {
